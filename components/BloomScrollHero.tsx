@@ -3,6 +3,9 @@
 import { useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Lenis from "lenis";
+import "lenis/dist/lenis.css";
+import MomijiLayer from "./MomijiLayer";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -20,8 +23,24 @@ export default function BloomScrollHero() {
     if (!sectionEl || !videoEl || !heroTextEl) return;
 
     let removeVideoTicker: (() => void) | undefined;
+    let removeLenisRaf: (() => void) | undefined;
     let restoreLagSmoothing: (() => void) | undefined;
     let removeResizeListener: (() => void) | undefined;
+
+    const lenis = new Lenis({
+      duration: 1.05,
+      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true,
+      touchMultiplier: 1.65,
+      wheelMultiplier: 1,
+    });
+
+    const lenisRaf = (time: number) => {
+      lenis.raf(time * 1000);
+    };
+    gsap.ticker.add(lenisRaf);
+    removeLenisRaf = () => gsap.ticker.remove(lenisRaf);
+    lenis.on("scroll", ScrollTrigger.update);
 
     const ctx = gsap.context(() => {
       let onLoadedMetadata: (() => void) | null = null;
@@ -42,11 +61,15 @@ export default function BloomScrollHero() {
           return gsap.utils.clamp(0, 1, -top / denom);
         };
 
+        let smoothTime = 0;
+
         const syncVideoToScroll = () => {
-          const p = scrollProgressForSection();
-          const next = p * duration;
-          if (Math.abs(videoEl.currentTime - next) > 1e-4) {
-            videoEl.currentTime = next;
+          const target = scrollProgressForSection() * duration;
+          const blend = 1 - Math.pow(0.72, gsap.ticker.deltaRatio());
+          smoothTime += (target - smoothTime) * Math.min(1, blend * 1.35);
+          const seek = gsap.utils.clamp(0, duration, smoothTime);
+          if (Math.abs(videoEl.currentTime - seek) > 1 / 200) {
+            videoEl.currentTime = seek;
           }
         };
 
@@ -73,6 +96,8 @@ export default function BloomScrollHero() {
         );
 
         ScrollTrigger.refresh();
+        smoothTime = scrollProgressForSection() * duration;
+        videoEl.currentTime = smoothTime;
         syncVideoToScroll();
 
         const onResize = () => ScrollTrigger.refresh();
@@ -96,6 +121,8 @@ export default function BloomScrollHero() {
 
     return () => {
       removeVideoTicker?.();
+      removeLenisRaf?.();
+      lenis.destroy();
       removeResizeListener?.();
       restoreLagSmoothing?.();
       ctx.revert();
@@ -113,7 +140,9 @@ export default function BloomScrollHero() {
           <span className="left-rail-text">Re-Palette</span>
         </div>
 
-        <div className="hero-main">
+        <MomijiLayer />
+
+        <div className="hero-content">
           <div className="flower-slot" aria-hidden="true">
             <div className="flower-mask">
               <video
@@ -130,13 +159,26 @@ export default function BloomScrollHero() {
             <div className="flower-soft-edge" aria-hidden="true" />
           </div>
 
-          <div ref={heroTextRef} className="hero-copy">
-            <p className="vertical-lead">内なる輝きが、今ひらく。</p>
-            <div className="english-stack">
-              <p className="english-line">EMPOWERMENT THROUGH BEAUTY</p>
-              <p className="english-line muted">Your Inner Radiance,</p>
-              <p className="english-line small">SOCIAL REINTEGRATION THROUGH SUPPORT.</p>
+          <div className="right-stack">
+            <div ref={heroTextRef} className="hero-copy">
+              <p className="vertical-lead">内なる輝きが、今ひらく。</p>
+              <div className="english-stack">
+                <p className="english-line">EMPOWERMENT THROUGH BEAUTY</p>
+                <p className="english-line muted">Your Inner Radiance,</p>
+                <p className="english-line small">SOCIAL REINTEGRATION THROUGH SUPPORT.</p>
+              </div>
             </div>
+
+            <aside className="paper-card card-right">
+              <div className="paper-icon steps" aria-hidden="true" />
+              <p className="paper-title">SOCIAL STEPPING STONES</p>
+              <p className="paper-body">
+                Gentle steps back into connection—paced for you, supported at every landing.
+              </p>
+              <a href="#" className="link-more">
+                Link more
+              </a>
+            </aside>
           </div>
         </div>
 
@@ -170,17 +212,6 @@ export default function BloomScrollHero() {
           <button type="button" className="btn-like">
             Like
           </button>
-        </aside>
-
-        <aside className="paper-card card-right">
-          <div className="paper-icon steps" aria-hidden="true" />
-          <p className="paper-title">SOCIAL STEPPING STONES</p>
-          <p className="paper-body">
-            Gentle steps back into connection—paced for you, supported at every landing.
-          </p>
-          <a href="#" className="link-more">
-            Link more
-          </a>
         </aside>
 
         <div className="social-rail" aria-hidden="true">
@@ -271,7 +302,7 @@ export default function BloomScrollHero() {
           font-weight: 300;
         }
 
-        .hero-main {
+        .hero-content {
           position: absolute;
           inset: 0;
           left: var(--rail-w);
@@ -279,8 +310,8 @@ export default function BloomScrollHero() {
           pointer-events: none;
         }
 
-        .flower-slot,
-        .hero-copy {
+        .hero-content .flower-slot,
+        .hero-content .right-stack {
           pointer-events: auto;
         }
 
@@ -289,10 +320,27 @@ export default function BloomScrollHero() {
           left: 50%;
           top: 50%;
           transform: translate(-50%, -50%);
-          z-index: 3;
+          z-index: 4;
           display: flex;
           align-items: center;
           justify-content: center;
+        }
+
+        .right-stack {
+          position: absolute;
+          top: clamp(5.85rem, 12.5vh, 8.75rem);
+          right: clamp(2.5rem, 4.5vw, 3.75rem);
+          bottom: clamp(1rem, 3.5vh, 2rem);
+          width: min(278px, calc(26vw + 8px));
+          display: flex;
+          flex-direction: column;
+          align-items: stretch;
+          gap: clamp(1.25rem, 3.6vh, 2.25rem);
+          z-index: 8;
+        }
+
+        .right-stack .card-right {
+          margin-top: auto;
         }
 
         .flower-mask {
@@ -343,18 +391,19 @@ export default function BloomScrollHero() {
         }
 
         .hero-copy {
-          position: absolute;
-          left: calc(50% + min(37vmin, 268px) + clamp(1.25rem, 4vw, 3.5rem));
-          top: 50%;
-          transform: translateY(-52%);
-          z-index: 4;
+          position: relative;
+          left: auto;
+          top: auto;
+          transform: none;
+          z-index: 1;
           display: flex;
           flex-direction: row;
           align-items: flex-start;
           justify-content: flex-start;
-          gap: clamp(1rem, 2.2vw, 2rem);
+          gap: clamp(0.7rem, 1.8vw, 1.2rem);
           padding-top: 0;
-          opacity: 0.94;
+          opacity: 0.96;
+          max-width: 100%;
         }
 
         .vertical-lead {
@@ -371,7 +420,7 @@ export default function BloomScrollHero() {
         .english-stack {
           margin: 0;
           padding-top: 0.35rem;
-          max-width: 15.5rem;
+          max-width: 13.25rem;
           font-family: ui-sans-serif, system-ui, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
         }
 
@@ -493,9 +542,12 @@ export default function BloomScrollHero() {
         }
 
         .card-right {
-          right: clamp(0.85rem, 2.8vw, 2.25rem);
-          bottom: 13vh;
-          transform: rotate(1deg);
+          position: relative;
+          right: auto;
+          bottom: auto;
+          transform: rotate(0.65deg);
+          width: 100%;
+          flex-shrink: 0;
         }
 
         .paper-icon {
@@ -566,9 +618,11 @@ export default function BloomScrollHero() {
 
         .social-rail {
           position: absolute;
-          right: clamp(0.45rem, 1.1vw, 0.95rem);
-          bottom: 17vh;
-          z-index: 7;
+          right: clamp(0.35rem, 0.95vw, 0.7rem);
+          top: 50%;
+          transform: translateY(-38%);
+          bottom: auto;
+          z-index: 9;
           display: flex;
           flex-direction: column;
           gap: 0.95rem;
@@ -591,21 +645,23 @@ export default function BloomScrollHero() {
 
         @media (max-width: 1100px) {
           .flower-mask {
-            width: min(68vmin, 460px);
+            width: min(66vmin, 440px);
           }
 
-          .hero-copy {
-            left: calc(50% + min(34vmin, 230px) + clamp(0.85rem, 3vw, 2rem));
+          .right-stack {
+            width: min(252px, 30vw);
+            right: clamp(2rem, 4vw, 3rem);
           }
         }
 
         @media (max-width: 900px) {
-          .hero-main {
+          .hero-content {
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             padding: 5.25rem 1rem 2rem;
+            pointer-events: auto;
           }
 
           .flower-slot {
@@ -619,12 +675,23 @@ export default function BloomScrollHero() {
             width: min(76vmin, 400px);
           }
 
-          .hero-copy {
+          .right-stack {
             position: relative;
-            left: auto;
+            right: auto;
             top: auto;
-            transform: none;
-            margin-top: 1.5rem;
+            bottom: auto;
+            width: 100%;
+            max-width: 24rem;
+            margin-top: 1.35rem;
+            gap: 1.5rem;
+            align-items: stretch;
+          }
+
+          .right-stack .card-right {
+            margin-top: 0;
+          }
+
+          .hero-copy {
             flex-direction: column;
             align-items: center;
             text-align: center;
