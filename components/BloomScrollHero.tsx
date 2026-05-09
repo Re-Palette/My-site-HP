@@ -13,6 +13,7 @@ const VIDEO_FILE = "Firefly ゆっくりと花が開花する動画 316695.mp4";
 
 export default function BloomScrollHero() {
   const [isLoading, setIsLoading] = useState(true);
+  const [deviceType, setDeviceType] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
   const sectionRef = useRef<HTMLElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -23,6 +24,32 @@ export default function BloomScrollHero() {
     const videoEl = videoRef.current;
     const loadingEl = loadingRef.current;
     if (!sectionEl || !videoEl) return;
+
+    // デバイス検出
+    const detectDevice = () => {
+      const width = window.innerWidth;
+      if (width <= 768) {
+        setDeviceType('mobile');
+      } else if (width <= 1024) {
+        setDeviceType('tablet');
+      } else {
+        setDeviceType('desktop');
+      }
+    };
+
+    // 初期検出
+    detectDevice();
+
+    // リサイズ時の検出
+    const handleResize = () => {
+      detectDevice();
+    };
+    window.addEventListener('resize', handleResize);
+
+    // デバイス検出のクリーンアップ
+    const removeDeviceDetection = () => {
+      window.removeEventListener('resize', handleResize);
+    };
 
     // ロード画面のアニメーション
     const hideLoading = () => {
@@ -158,6 +185,7 @@ export default function BloomScrollHero() {
       removeLenisRaf?.();
       lenis.destroy();
       removeResizeListener?.();
+      removeDeviceDetection?.();
       restoreLagSmoothing?.();
       ctx.revert();
     };
@@ -1322,17 +1350,81 @@ export default function BloomScrollHero() {
           text-decoration: none;
         }
 
-        @media (max-width: 1000px) {
-          .quote-row {
-            grid-template-columns: 1fr;
+        /* PC用最適化 (1025px以上) */
+        @media (min-width: 1025px) {
+          .flower-slot {
+            width: 58vw;
+            height: 58vw;
+            max-width: 900px;
+            max-height: 900px;
           }
 
-          .split-cards {
-            grid-template-columns: 1fr;
+          .hero-copy {
+            right: 2rem;
+            top: 18vh;
+            max-width: 420px;
+          }
+
+          .paper-card {
+            max-width: 380px;
+            margin: 1.5rem 0;
           }
         }
 
-        @media (max-width: 900px) {
+        /* タブレット用最適化 (769px-1024px) */
+        @media (min-width: 769px) and (max-width: 1024px) {
+          .flower-slot {
+            width: 70vw;
+            height: 70vw;
+            max-width: 600px;
+            max-height: 600px;
+          }
+
+          .hero-copy {
+            right: 50%;
+            top: 12vh;
+            transform: translateX(50%);
+            max-width: 80vw;
+            text-align: center;
+            align-items: center;
+          }
+
+          .vertical-lead {
+            writing-mode: horizontal-tb;
+            letter-spacing: 0.12em;
+            font-size: clamp(1.1rem, 2.8vw, 1.4rem);
+          }
+
+          .english-stack {
+            max-width: 100%;
+            text-align: center;
+          }
+
+          .top-nav {
+            font-size: 0.75rem;
+            gap: 0.8rem;
+          }
+
+          .paper-card {
+            max-width: 340px;
+            margin: 1.2rem auto;
+          }
+
+          .scroll-inner {
+            padding-left: 2rem;
+            padding-right: 2rem;
+          }
+        }
+
+        /* スマホ用最適化 (768px以下) */
+        @media (max-width: 768px) {
+          .flower-slot {
+            width: 85vw;
+            height: 85vw;
+            max-width: 400px;
+            max-height: 400px;
+          }
+
           .sticky-visuals .card-left,
           .sticky-visuals .card-right {
             display: none;
@@ -1340,9 +1432,9 @@ export default function BloomScrollHero() {
 
           .sticky-visuals .hero-copy {
             right: 50%;
-            top: 16vh;
+            top: 8vh;
             transform: translateX(50%);
-            max-width: 86vw;
+            max-width: 90vw;
             flex-direction: column;
             align-items: center;
             text-align: center;
@@ -1350,11 +1442,18 @@ export default function BloomScrollHero() {
 
           .vertical-lead {
             writing-mode: horizontal-tb;
-            letter-spacing: 0.14em;
+            letter-spacing: 0.1em;
+            font-size: clamp(0.9rem, 3.5vw, 1.2rem);
+            line-height: 1.6;
           }
 
           .english-stack {
             max-width: 100%;
+            text-align: center;
+          }
+
+          .english-line {
+            font-size: clamp(0.6rem, 2.8vw, 0.9rem);
           }
 
           .top-nav {
@@ -1365,17 +1464,113 @@ export default function BloomScrollHero() {
             display: none;
           }
 
+          .brand-title {
+            font-size: clamp(1.2rem, 4vw, 1.6rem);
+          }
+
+          .brand-sub {
+            font-size: clamp(0.6rem, 2.5vw, 0.8rem);
+          }
+
+          .paper-card {
+            max-width: 100%;
+            margin: 1rem 0;
+            padding: 1.2rem;
+          }
+
+          .paper-title {
+            font-size: clamp(0.9rem, 3.5vw, 1.1rem);
+          }
+
+          .paper-body {
+            font-size: clamp(0.75rem, 3vw, 0.9rem);
+            line-height: 1.7;
+          }
+
+          .scroll-inner {
+            padding: 1rem;
+          }
+
+          .band-labels {
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.5rem;
+          }
+
+          .pill {
+            font-size: 0.65rem;
+            padding: 0.3rem 0.7rem;
+          }
+
           .site-footer-inner {
             grid-template-columns: 1fr;
             text-align: center;
+            padding: 2rem 1rem;
           }
 
           .footer-copy {
             text-align: center;
+            font-size: 0.75rem;
           }
 
           .footer-links {
             justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+          }
+
+          .footer-links a {
+            font-size: 0.8rem;
+          }
+        }
+
+        /* 小型スマホ用最適化 (480px以下) */
+        @media (max-width: 480px) {
+          .flower-slot {
+            width: 90vw;
+            height: 90vw;
+            max-width: 320px;
+            max-height: 320px;
+          }
+
+          .hero-copy {
+            top: 6vh;
+            max-width: 95vw;
+          }
+
+          .vertical-lead {
+            font-size: clamp(0.8rem, 4vw, 1rem);
+          }
+
+          .brand-title {
+            font-size: clamp(1rem, 5vw, 1.4rem);
+          }
+
+          .brand-sub {
+            font-size: clamp(0.55rem, 3vw, 0.75rem);
+          }
+
+          .paper-card {
+            margin: 0.8rem 0;
+            padding: 1rem;
+          }
+
+          .paper-title {
+            font-size: clamp(0.8rem, 4vw, 1rem);
+          }
+
+          .paper-body {
+            font-size: clamp(0.7rem, 3.5vw, 0.85rem);
+          }
+
+          .scroll-inner {
+            padding: 0.8rem;
+          }
+
+          .btn-like,
+          .link-more {
+            font-size: 0.75rem;
+            padding: 0.6rem 1.2rem;
           }
         }
       `}</style>
