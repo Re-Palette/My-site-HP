@@ -162,7 +162,7 @@ export default function BloomScrollHero() {
         </header>
 
         <aside className="paper-card card-left">
-          <p className="paper-kicker">◇</p>
+          <div className="paper-icon mindful" aria-hidden="true" />
           <p className="paper-title">MINDFUL BEAUTY</p>
           <p className="paper-body">
             Calm, intentional care that lets your presence settle and brighten—without rushing the bloom.
@@ -173,7 +173,7 @@ export default function BloomScrollHero() {
         </aside>
 
         <aside className="paper-card card-right">
-          <p className="paper-kicker">▭</p>
+          <div className="paper-icon steps" aria-hidden="true" />
           <p className="paper-title">SOCIAL STEPPING STONES</p>
           <p className="paper-body">
             Gentle steps back into connection—paced for you, supported at every landing.
@@ -206,34 +206,44 @@ export default function BloomScrollHero() {
           width: 100%;
           isolation: isolate;
           overflow: hidden;
+          --rail-w: clamp(42px, 4.2vw, 58px);
         }
 
         .cream-bg {
           position: absolute;
           inset: 0;
-          background: linear-gradient(165deg, #f7f4ec 0%, #efe8dc 45%, #ebe3d4 100%);
+          background:
+            radial-gradient(ellipse 130% 85% at 72% 18%, rgba(255, 253, 248, 0.97) 0%, transparent 52%),
+            linear-gradient(168deg, #faf7ef 0%, #f4ebe2 40%, #efe6da 100%);
           z-index: 0;
         }
 
         .accent-maple {
           position: absolute;
-          top: -6%;
-          left: -4%;
-          width: 42vmin;
-          height: 42vmin;
-          background: radial-gradient(circle, rgba(120, 52, 40, 0.14) 0%, transparent 70%);
-          filter: blur(18px);
+          top: -10%;
+          left: calc(var(--rail-w) - 12px);
+          width: 50vmin;
+          height: 46vmin;
+          background: radial-gradient(
+            circle at 38% 38%,
+            rgba(165, 82, 68, 0.26) 0%,
+            rgba(130, 62, 48, 0.12) 42%,
+            transparent 70%
+          );
+          filter: blur(26px);
           z-index: 0;
         }
 
         .accent-garden {
           position: absolute;
-          bottom: -12%;
-          left: -8%;
-          width: 55vmin;
-          height: 40vmin;
-          background: radial-gradient(ellipse at 30% 60%, rgba(88, 110, 72, 0.12) 0%, transparent 65%);
-          filter: blur(22px);
+          bottom: -16%;
+          left: calc(var(--rail-w) - 6%);
+          width: 62vmin;
+          height: 48vmin;
+          background:
+            radial-gradient(ellipse at 28% 52%, rgba(252, 252, 250, 0.9) 0%, transparent 48%),
+            radial-gradient(ellipse at 42% 68%, rgba(88, 112, 74, 0.13) 0%, transparent 58%);
+          filter: blur(28px);
           z-index: 0;
         }
 
@@ -242,236 +252,292 @@ export default function BloomScrollHero() {
           left: 0;
           top: 0;
           bottom: 0;
-          width: clamp(36px, 3.6vw, 52px);
-          background: linear-gradient(180deg, #2a2622 0%, #1a1816 100%);
-          z-index: 4;
+          width: var(--rail-w);
+          background: linear-gradient(180deg, #2e2925 0%, #171513 100%);
+          z-index: 6;
           display: flex;
           align-items: center;
           justify-content: center;
+          box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.04);
         }
 
         .left-rail-text {
           writing-mode: vertical-rl;
           text-orientation: mixed;
-          color: rgba(245, 241, 232, 0.82);
-          font-size: 0.62rem;
-          letter-spacing: 0.35em;
+          color: rgba(248, 244, 236, 0.78);
+          font-size: 0.58rem;
+          letter-spacing: 0.42em;
           text-transform: uppercase;
+          font-weight: 300;
         }
 
         .hero-main {
           position: absolute;
           inset: 0;
-          left: clamp(36px, 3.6vw, 52px);
+          left: var(--rail-w);
           z-index: 2;
-          display: grid;
-          grid-template-columns: 1.15fr 0.85fr;
-          align-items: center;
-          padding: 0 clamp(1rem, 4vw, 4rem) 0 clamp(0.5rem, 2vw, 2rem);
-          max-width: 1280px;
-          margin: 0 auto;
-          box-sizing: border-box;
+          pointer-events: none;
+        }
+
+        .flower-slot,
+        .hero-copy {
+          pointer-events: auto;
         }
 
         .flower-slot {
-          position: relative;
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+          z-index: 3;
           display: flex;
           align-items: center;
           justify-content: center;
-          min-height: 72vh;
         }
 
         .flower-mask {
           position: relative;
-          width: min(72vmin, 520px);
-          aspect-ratio: 3 / 4;
+          width: min(74vmin, 536px);
+          aspect-ratio: 24 / 31;
           border-radius: 50%;
           overflow: hidden;
           mask-image: radial-gradient(
-            ellipse 52% 56% at 50% 48%,
+            ellipse 50% 58% at 50% 46%,
             #000 0%,
-            #000 52%,
-            rgba(0, 0, 0, 0.45) 72%,
+            #000 54%,
+            rgba(0, 0, 0, 0.42) 74%,
             rgba(0, 0, 0, 0) 100%
           );
           -webkit-mask-image: radial-gradient(
-            ellipse 52% 56% at 50% 48%,
+            ellipse 50% 58% at 50% 46%,
             #000 0%,
-            #000 52%,
-            rgba(0, 0, 0, 0.45) 72%,
+            #000 54%,
+            rgba(0, 0, 0, 0.42) 74%,
             rgba(0, 0, 0, 0) 100%
           );
+          box-shadow: 0 28px 60px rgba(62, 52, 42, 0.08);
         }
 
         .bloom-video {
           position: absolute;
-          inset: -8%;
-          width: 116%;
-          height: 116%;
+          inset: -7%;
+          width: 114%;
+          height: 114%;
           object-fit: cover;
-          object-position: 52% 42%;
-          filter: saturate(1.02) contrast(1.02);
+          object-position: 50% 46%;
+          filter: saturate(1.03) contrast(1.03) brightness(1.01);
         }
 
         .flower-soft-edge {
           pointer-events: none;
           position: absolute;
-          inset: -12%;
-          background: radial-gradient(ellipse 48% 50% at 50% 48%, transparent 45%, rgba(247, 244, 236, 0.55) 78%, rgba(247, 244, 236, 1) 100%);
+          inset: -14%;
+          background: radial-gradient(
+            ellipse 46% 52% at 50% 46%,
+            transparent 42%,
+            rgba(250, 246, 237, 0.45) 76%,
+            rgba(250, 246, 237, 0.92) 100%
+          );
           mix-blend-mode: multiply;
-          opacity: 0.35;
+          opacity: 0.38;
         }
 
         .hero-copy {
+          position: absolute;
+          left: calc(50% + min(37vmin, 268px) + clamp(1.25rem, 4vw, 3.5rem));
+          top: 50%;
+          transform: translateY(-52%);
+          z-index: 4;
           display: flex;
           flex-direction: row;
           align-items: flex-start;
           justify-content: flex-start;
-          gap: clamp(1rem, 2.5vw, 2.25rem);
-          padding-top: 6vh;
-          opacity: 0.92;
+          gap: clamp(1rem, 2.2vw, 2rem);
+          padding-top: 0;
+          opacity: 0.94;
         }
 
         .vertical-lead {
           margin: 0;
           writing-mode: vertical-rl;
           text-orientation: mixed;
-          font-size: clamp(1.35rem, 2.4vw, 2.35rem);
-          font-weight: 400;
-          letter-spacing: 0.22em;
-          line-height: 1.75;
+          font-size: clamp(1.28rem, 2.35vw, 2.28rem);
+          font-weight: 300;
+          letter-spacing: 0.26em;
+          line-height: 1.85;
+          color: #161412;
         }
 
         .english-stack {
           margin: 0;
-          padding-top: 0.25rem;
-          max-width: 16rem;
+          padding-top: 0.35rem;
+          max-width: 15.5rem;
           font-family: ui-sans-serif, system-ui, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
         }
 
         .english-line {
-          margin: 0 0 0.55rem;
-          font-size: clamp(0.62rem, 1vw, 0.78rem);
-          letter-spacing: 0.14em;
-          line-height: 1.45;
+          margin: 0 0 0.48rem;
+          font-size: clamp(0.6rem, 0.95vw, 0.76rem);
+          letter-spacing: 0.16em;
+          line-height: 1.48;
           text-transform: uppercase;
           font-weight: 500;
+          color: #221e1a;
         }
 
         .english-line.muted {
-          opacity: 0.72;
+          opacity: 0.68;
           text-transform: none;
-          letter-spacing: 0.06em;
+          letter-spacing: 0.07em;
+          font-weight: 400;
         }
 
         .english-line.small {
-          font-size: clamp(0.55rem, 0.9vw, 0.68rem);
-          letter-spacing: 0.12em;
+          font-size: clamp(0.52rem, 0.88vw, 0.66rem);
+          letter-spacing: 0.13em;
+          line-height: 1.55;
         }
 
         .top-bar {
           position: absolute;
-          top: clamp(0.85rem, 2vw, 1.6rem);
-          left: 50%;
-          transform: translateX(-50%);
-          width: min(1180px, calc(100vw - 2.5rem));
-          display: flex;
+          top: clamp(0.9rem, 2.2vw, 1.75rem);
+          left: var(--rail-w);
+          right: 0;
+          padding: 0 clamp(1rem, 3vw, 2.25rem);
+          display: grid;
+          grid-template-columns: 1fr auto 1fr;
           align-items: flex-start;
-          justify-content: center;
-          z-index: 5;
+          z-index: 7;
           pointer-events: none;
         }
 
         .brand-center {
+          grid-column: 2;
+          justify-self: center;
           display: flex;
+          flex-direction: row;
           gap: 0.55rem;
           align-items: flex-start;
           text-align: left;
           pointer-events: auto;
+          margin-top: 0.1rem;
         }
 
-        .brand-icon {
-          font-size: 1rem;
-          line-height: 1.2;
-          opacity: 0.75;
+        .brand-center .brand-icon {
+          font-size: 1.15rem;
+          line-height: 1;
+          opacity: 0.72;
+          letter-spacing: 0;
         }
 
         .brand-title {
           margin: 0;
-          font-size: clamp(1rem, 2vw, 1.55rem);
-          letter-spacing: 0.06em;
+          font-size: clamp(1.05rem, 2.1vw, 1.62rem);
+          letter-spacing: 0.08em;
+          font-weight: 400;
         }
 
         .brand-sub {
-          margin: 0.15rem 0 0;
-          font-size: 0.68rem;
-          letter-spacing: 0.04em;
-          opacity: 0.78;
+          margin: 0.12rem 0 0;
+          font-size: 0.66rem;
+          letter-spacing: 0.06em;
+          opacity: 0.74;
+          font-weight: 300;
         }
 
         .top-nav {
-          position: absolute;
-          right: 0;
-          top: 0.15rem;
+          grid-column: 3;
+          justify-self: end;
+          align-self: start;
+          padding-top: 0.35rem;
           display: flex;
           align-items: center;
-          gap: 0.45rem;
+          gap: 0.42rem;
           font-family: ui-sans-serif, system-ui, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-          font-size: 0.68rem;
-          letter-spacing: 0.12em;
+          font-size: 0.66rem;
+          letter-spacing: 0.13em;
           pointer-events: auto;
         }
 
         .top-nav a {
-          color: #1c1916;
+          color: #1a1714;
           text-decoration: none;
+          font-weight: 500;
+        }
+
+        .top-nav a:hover {
+          opacity: 0.65;
         }
 
         .nav-sep {
-          opacity: 0.35;
+          opacity: 0.28;
           user-select: none;
+          font-weight: 300;
         }
 
         .paper-card {
           position: absolute;
-          z-index: 5;
-          width: min(300px, calc(100vw - 5rem));
-          padding: 1.1rem 1.15rem 1rem;
-          background: rgba(255, 255, 255, 0.92);
-          color: #1c1916;
-          border: 1px solid rgba(210, 200, 184, 0.65);
-          box-shadow: 0 18px 42px rgba(40, 34, 28, 0.12);
+          z-index: 7;
+          width: min(292px, calc(100vw - var(--rail-w) - 2.5rem));
+          padding: 1.05rem 1.2rem 0.95rem;
+          background: rgba(255, 254, 252, 0.94);
+          color: #161412;
+          border: 1px solid rgba(198, 188, 172, 0.55);
+          box-shadow: 0 22px 48px rgba(48, 40, 32, 0.1), 0 2px 0 rgba(255, 255, 255, 0.65) inset;
         }
 
         .card-left {
-          left: calc(clamp(36px, 3.6vw, 52px) + clamp(0.75rem, 3vw, 2.5rem));
-          top: 26vh;
-          transform: rotate(-1.2deg);
+          left: calc(var(--rail-w) + clamp(0.65rem, 2.4vw, 1.85rem));
+          top: 21vh;
+          transform: rotate(-1.4deg);
         }
 
         .card-right {
-          right: clamp(1rem, 3vw, 2.5rem);
-          bottom: 14vh;
-          transform: rotate(0.8deg);
+          right: clamp(0.85rem, 2.8vw, 2.25rem);
+          bottom: 13vh;
+          transform: rotate(1deg);
         }
 
-        .paper-kicker {
-          margin: 0 0 0.2rem;
-          font-size: 0.75rem;
-          opacity: 0.55;
+        .paper-icon {
+          width: 34px;
+          height: 34px;
+          margin-bottom: 0.5rem;
+          border-radius: 50%;
+          border: 1px solid rgba(22, 20, 18, 0.08);
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+        }
+
+        .paper-icon.mindful {
+          background:
+            radial-gradient(circle at 45% 42%, rgba(230, 198, 118, 0.45) 0%, transparent 58%),
+            linear-gradient(165deg, #fdfcfa 0%, #f3ebe3 100%);
+        }
+
+        .paper-icon.steps {
+          background: linear-gradient(
+              180deg,
+              transparent 0%,
+              transparent 38%,
+              rgba(22, 20, 18, 0.07) 38%,
+              rgba(22, 20, 18, 0.07) 62%,
+              transparent 62%
+            ),
+            linear-gradient(165deg, #fdfcfa 0%, #f3ebe3 100%);
         }
 
         .paper-title {
           margin: 0;
-          font-size: 1rem;
-          letter-spacing: 0.04em;
+          font-size: 0.98rem;
+          letter-spacing: 0.045em;
+          font-weight: 500;
         }
 
         .paper-body {
-          margin: 0.65rem 0 0;
-          line-height: 1.55;
-          font-size: 0.82rem;
-          opacity: 0.88;
+          margin: 0.6rem 0 0;
+          line-height: 1.58;
+          font-size: 0.8rem;
+          opacity: 0.84;
+          font-weight: 400;
         }
 
         .btn-like {
@@ -500,43 +566,73 @@ export default function BloomScrollHero() {
 
         .social-rail {
           position: absolute;
-          right: clamp(0.5rem, 1.2vw, 1rem);
-          bottom: 18vh;
-          z-index: 5;
+          right: clamp(0.45rem, 1.1vw, 0.95rem);
+          bottom: 17vh;
+          z-index: 7;
           display: flex;
           flex-direction: column;
-          gap: 0.85rem;
+          gap: 0.95rem;
           font-family: ui-sans-serif, system-ui, sans-serif;
-          font-size: 0.72rem;
-          color: rgba(28, 25, 22, 0.55);
+          font-size: 0.68rem;
+          font-weight: 500;
+          color: rgba(26, 23, 20, 0.48);
+        }
+
+        .social-rail span {
+          width: 22px;
+          height: 22px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border: 1px solid rgba(26, 23, 20, 0.14);
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.35);
+        }
+
+        @media (max-width: 1100px) {
+          .flower-mask {
+            width: min(68vmin, 460px);
+          }
+
+          .hero-copy {
+            left: calc(50% + min(34vmin, 230px) + clamp(0.85rem, 3vw, 2rem));
+          }
         }
 
         @media (max-width: 900px) {
           .hero-main {
-            grid-template-columns: 1fr;
-            grid-template-rows: auto auto;
-            padding-top: 4.5rem;
-            align-content: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 5.25rem 1rem 2rem;
           }
 
           .flower-slot {
-            min-height: 48vh;
+            position: relative;
+            left: auto;
+            top: auto;
+            transform: none;
           }
 
           .flower-mask {
-            width: min(78vmin, 420px);
+            width: min(76vmin, 400px);
           }
 
           .hero-copy {
+            position: relative;
+            left: auto;
+            top: auto;
+            transform: none;
+            margin-top: 1.5rem;
             flex-direction: column;
             align-items: center;
             text-align: center;
-            padding-top: 0;
           }
 
           .vertical-lead {
             writing-mode: horizontal-tb;
-            letter-spacing: 0.12em;
+            letter-spacing: 0.14em;
           }
 
           .english-stack {
