@@ -249,18 +249,21 @@ export default function BloomScrollHero() {
             Beauty &amp; Social Integration — 内なる輝きを、社会とともにひらいていく。
           </p>
 
-          <footer className="site-footer">
-            <p className="footer-brand">Re-Palette</p>
-            <p className="footer-copy">Beauty &amp; Social Integration / Since 2026</p>
-            <div className="footer-links">
-              <a href="#">About</a>
-              <a href="#">Programs</a>
-              <a href="#">Support</a>
-              <a href="#">Contact</a>
-            </div>
-          </footer>
         </div>
       </div>
+
+      <footer className="site-footer">
+        <div className="site-footer-inner">
+          <p className="footer-brand">Re-Palette</p>
+          <p className="footer-copy">Beauty &amp; Social Integration / Since 2026</p>
+          <div className="footer-links">
+            <a href="#">About</a>
+            <a href="#">Programs</a>
+            <a href="#">Support</a>
+            <a href="#">Contact</a>
+          </div>
+        </div>
+      </footer>
 
       <style jsx>{`
         .bloom-scroll-section {
@@ -820,31 +823,44 @@ export default function BloomScrollHero() {
         }
 
         .site-footer {
-          margin-top: 1.5rem;
-          padding: 1.4rem 0 2.2rem;
-          border-top: 1px solid rgba(198, 188, 172, 0.45);
-          text-align: center;
-          background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.22));
+          position: relative;
+          z-index: 60;
+          margin-top: 0;
+          padding: 0;
+          background: linear-gradient(180deg, #2a2622 0%, #181614 100%);
+          color: rgba(247, 242, 234, 0.9);
+          border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .site-footer-inner {
+          margin-left: var(--rail-w);
+          min-height: 84px;
+          padding: 1rem 1rem 1.2rem;
+          display: grid;
+          grid-template-columns: auto 1fr auto;
+          align-items: center;
+          gap: 0.85rem;
         }
 
         .footer-brand {
           margin: 0;
-          font-size: 1.02rem;
+          font-size: 0.98rem;
           letter-spacing: 0.08em;
+          color: rgba(255, 255, 255, 0.92);
         }
 
         .footer-copy {
-          margin: 0.35rem 0 0;
-          font-size: 0.7rem;
+          margin: 0;
+          font-size: 0.68rem;
           letter-spacing: 0.08em;
-          opacity: 0.72;
+          opacity: 0.78;
           font-family: ui-sans-serif, system-ui, sans-serif;
+          text-align: center;
         }
 
         .footer-links {
-          margin-top: 0.85rem;
           display: flex;
-          justify-content: center;
+          justify-content: flex-end;
           gap: 0.95rem;
           flex-wrap: wrap;
           font-family: ui-sans-serif, system-ui, sans-serif;
@@ -853,7 +869,7 @@ export default function BloomScrollHero() {
         }
 
         .footer-links a {
-          color: #473e34;
+          color: rgba(255, 255, 255, 0.86);
           text-decoration: none;
         }
 
@@ -903,6 +919,19 @@ export default function BloomScrollHero() {
 
           .social-rail {
             display: none;
+          }
+
+          .site-footer-inner {
+            grid-template-columns: 1fr;
+            text-align: center;
+          }
+
+          .footer-copy {
+            text-align: center;
+          }
+
+          .footer-links {
+            justify-content: center;
           }
         }
       `}</style>
