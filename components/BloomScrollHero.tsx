@@ -1098,22 +1098,23 @@ export default function BloomScrollHero() {
           letter-spacing: 0.08em;
           font-family: inherit;
           cursor: pointer;
-          box-shadow: 0 2px 4px rgba(90, 70, 30, 0.25);
+          box-shadow: 0 1px 3px rgba(90, 70, 30, 0.2);
           transition: all 0.2s ease;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
+          position: relative;
         }
 
         .btn-like:hover {
           background: linear-gradient(180deg, #f0d074 0%, #d6b355 100%);
           transform: translateY(-1px);
-          box-shadow: 0 3px 6px rgba(90, 70, 30, 0.35);
+          box-shadow: 0 2px 5px rgba(90, 70, 30, 0.3);
         }
 
         .btn-like:active {
           transform: translateY(0);
-          box-shadow: 0 1px 2px rgba(90, 70, 30, 0.25);
+          box-shadow: 0 1px 2px rgba(90, 70, 30, 0.15);
         }
 
         .link-more {
