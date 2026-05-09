@@ -170,18 +170,17 @@ export default function BloomScrollHero() {
         <MomijiLayer />
 
         <div className="scroll-inner">
-          <aside className="paper-card card-left">
-            <div className="paper-icon mindful" aria-hidden="true" />
-            <p className="paper-title">MINDFUL BEAUTY</p>
-            <p className="paper-body">
-              Calm, intentional care that lets your presence settle and brighten—without rushing the bloom.
-            </p>
-            <button type="button" className="btn-like">
-              Like
-            </button>
-          </aside>
-
           <div className="hero-band">
+            <aside className="paper-card card-left">
+              <div className="paper-icon mindful" aria-hidden="true" />
+              <p className="paper-title">MINDFUL BEAUTY</p>
+              <p className="paper-body">
+                Calm, intentional care that lets your presence settle and brighten-without rushing the bloom.
+              </p>
+              <button type="button" className="btn-like">
+                Like
+              </button>
+            </aside>
             <div className="hero-band-spacer" aria-hidden="true" />
             <div className="right-stack">
               <div className="hero-copy">
@@ -249,6 +248,17 @@ export default function BloomScrollHero() {
           <p className="closing-line">
             Beauty &amp; Social Integration — 内なる輝きを、社会とともにひらいていく。
           </p>
+
+          <footer className="site-footer">
+            <p className="footer-brand">Re-Palette</p>
+            <p className="footer-copy">Beauty &amp; Social Integration / Since 2026</p>
+            <div className="footer-links">
+              <a href="#">About</a>
+              <a href="#">Programs</a>
+              <a href="#">Support</a>
+              <a href="#">Contact</a>
+            </div>
+          </footer>
         </div>
       </div>
 
@@ -531,7 +541,9 @@ export default function BloomScrollHero() {
 
         .card-left {
           transform: rotate(-1.4deg);
-          margin-bottom: 2.5rem;
+          margin: 0;
+          justify-self: start;
+          align-self: start;
         }
 
         .paper-icon {
@@ -600,25 +612,24 @@ export default function BloomScrollHero() {
         }
 
         .hero-band {
-          display: flex;
-          flex-wrap: wrap;
-          justify-content: flex-end;
-          gap: 2rem;
+          display: grid;
+          grid-template-columns: minmax(230px, 292px) minmax(320px, 1fr) minmax(230px, 292px);
+          align-items: start;
+          gap: clamp(1.25rem, 2.4vw, 2.4rem);
           margin-bottom: 3rem;
-          min-height: 42vh;
+          min-height: 52vh;
         }
 
         .hero-band-spacer {
-          flex: 1 1 200px;
-          min-width: min(42vmin, 280px);
-          min-height: 120px;
+          min-height: min(60vh, 560px);
         }
 
         .right-stack {
-          flex: 0 1 min(278px, 32vw);
           display: flex;
           flex-direction: column;
           gap: clamp(1.25rem, 3vh, 2rem);
+          align-items: stretch;
+          justify-self: end;
         }
 
         .card-right {
@@ -799,13 +810,51 @@ export default function BloomScrollHero() {
 
         .closing-line {
           margin: 0;
-          padding: 1.5rem 0 6rem;
+          padding: 1.5rem 0 2rem;
           font-size: 0.82rem;
           letter-spacing: 0.06em;
           line-height: 1.8;
           opacity: 0.78;
           text-align: center;
           border-top: 1px solid rgba(198, 188, 172, 0.45);
+        }
+
+        .site-footer {
+          margin-top: 1.5rem;
+          padding: 1.4rem 0 2.2rem;
+          border-top: 1px solid rgba(198, 188, 172, 0.45);
+          text-align: center;
+          background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.22));
+        }
+
+        .footer-brand {
+          margin: 0;
+          font-size: 1.02rem;
+          letter-spacing: 0.08em;
+        }
+
+        .footer-copy {
+          margin: 0.35rem 0 0;
+          font-size: 0.7rem;
+          letter-spacing: 0.08em;
+          opacity: 0.72;
+          font-family: ui-sans-serif, system-ui, sans-serif;
+        }
+
+        .footer-links {
+          margin-top: 0.85rem;
+          display: flex;
+          justify-content: center;
+          gap: 0.95rem;
+          flex-wrap: wrap;
+          font-family: ui-sans-serif, system-ui, sans-serif;
+          font-size: 0.72rem;
+          letter-spacing: 0.08em;
+        }
+
+        .footer-links a {
+          color: #473e34;
+          text-decoration: none;
         }
 
         @media (max-width: 1000px) {
@@ -820,16 +869,15 @@ export default function BloomScrollHero() {
 
         @media (max-width: 900px) {
           .hero-band {
-            flex-direction: column;
-            align-items: center;
+            grid-template-columns: 1fr;
+            justify-items: center;
           }
 
           .hero-band-spacer {
-            min-height: 40vh;
+            min-height: 26vh;
           }
 
           .right-stack {
-            flex: 1 1 auto;
             width: 100%;
             max-width: 24rem;
           }
