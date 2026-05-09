@@ -19,27 +19,39 @@ export default function BloomScrollHero() {
     const heroTextEl = heroTextRef.current;
     if (!sectionEl || !videoEl || !heroTextEl) return;
 
+    let removeVideoTicker: (() => void) | undefined;
+
     const ctx = gsap.context(() => {
       let onLoadedMetadata: (() => void) | null = null;
+      let videoSyncReady = false;
 
       const setScrollSync = () => {
-        if (!videoEl.duration || Number.isNaN(videoEl.duration)) return;
+        const duration = videoEl.duration;
+        if (!duration || Number.isNaN(duration) || videoSyncReady) return;
+        videoSyncReady = true;
 
-        const scrubState = { t: 0 };
+        let targetTime = 0;
 
-        gsap.to(scrubState, {
-          t: videoEl.duration,
-          ease: "none",
-          scrollTrigger: {
-            trigger: sectionEl,
-            start: "top top",
-            end: "bottom bottom",
-            scrub: 1.5,
-          },
-          onUpdate: () => {
-            videoEl.currentTime = scrubState.t;
+        ScrollTrigger.create({
+          trigger: sectionEl,
+          start: "top top",
+          end: "bottom bottom",
+          scrub: true,
+          onUpdate: (self) => {
+            targetTime = gsap.utils.clamp(0, duration, self.progress * duration);
           },
         });
+
+        const smoothToTarget = () => {
+          const cur = videoEl.currentTime;
+          const diff = targetTime - cur;
+          if (Math.abs(diff) < 1 / 120) return;
+          const k = 1 - Math.pow(0.78, gsap.ticker.deltaRatio());
+          videoEl.currentTime = cur + diff * gsap.utils.clamp(0.15, 1, k);
+        };
+
+        gsap.ticker.add(smoothToTarget);
+        removeVideoTicker = () => gsap.ticker.remove(smoothToTarget);
 
         gsap.fromTo(
           heroTextEl,
@@ -52,7 +64,7 @@ export default function BloomScrollHero() {
               trigger: sectionEl,
               start: "top 58%",
               end: "top 18%",
-              scrub: 1.5,
+              scrub: 0.35,
             },
           }
         );
@@ -73,6 +85,7 @@ export default function BloomScrollHero() {
     }, sectionRef);
 
     return () => {
+      removeVideoTicker?.();
       ctx.revert();
     };
   }, []);
