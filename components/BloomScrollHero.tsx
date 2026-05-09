@@ -20,6 +20,8 @@ export default function BloomScrollHero() {
     if (!sectionEl || !videoEl || !heroTextEl) return;
 
     let removeVideoTicker: (() => void) | undefined;
+    let restoreLagSmoothing: (() => void) | undefined;
+    let removeResizeListener: (() => void) | undefined;
 
     const ctx = gsap.context(() => {
       let onLoadedMetadata: (() => void) | null = null;
@@ -30,28 +32,29 @@ export default function BloomScrollHero() {
         if (!duration || Number.isNaN(duration) || videoSyncReady) return;
         videoSyncReady = true;
 
-        let targetTime = 0;
+        videoEl.pause();
 
-        ScrollTrigger.create({
-          trigger: sectionEl,
-          start: "top top",
-          end: "bottom bottom",
-          scrub: true,
-          onUpdate: (self) => {
-            targetTime = gsap.utils.clamp(0, duration, self.progress * duration);
-          },
-        });
-
-        const smoothToTarget = () => {
-          const cur = videoEl.currentTime;
-          const diff = targetTime - cur;
-          if (Math.abs(diff) < 1 / 120) return;
-          const k = 1 - Math.pow(0.78, gsap.ticker.deltaRatio());
-          videoEl.currentTime = cur + diff * gsap.utils.clamp(0.15, 1, k);
+        const scrollProgressForSection = () => {
+          const sectionH = sectionEl.offsetHeight;
+          const vh = window.innerHeight;
+          const denom = Math.max(1e-6, sectionH - vh);
+          const top = sectionEl.getBoundingClientRect().top;
+          return gsap.utils.clamp(0, 1, -top / denom);
         };
 
-        gsap.ticker.add(smoothToTarget);
-        removeVideoTicker = () => gsap.ticker.remove(smoothToTarget);
+        const syncVideoToScroll = () => {
+          const p = scrollProgressForSection();
+          const next = p * duration;
+          if (Math.abs(videoEl.currentTime - next) > 1e-4) {
+            videoEl.currentTime = next;
+          }
+        };
+
+        gsap.ticker.add(syncVideoToScroll);
+        removeVideoTicker = () => gsap.ticker.remove(syncVideoToScroll);
+
+        gsap.ticker.lagSmoothing(0);
+        restoreLagSmoothing = () => gsap.ticker.lagSmoothing(500, 33);
 
         gsap.fromTo(
           heroTextEl,
@@ -64,10 +67,17 @@ export default function BloomScrollHero() {
               trigger: sectionEl,
               start: "top 58%",
               end: "top 18%",
-              scrub: 0.35,
+              scrub: true,
             },
           }
         );
+
+        ScrollTrigger.refresh();
+        syncVideoToScroll();
+
+        const onResize = () => ScrollTrigger.refresh();
+        window.addEventListener("resize", onResize);
+        removeResizeListener = () => window.removeEventListener("resize", onResize);
       };
 
       if (videoEl.readyState >= 1) {
@@ -86,6 +96,8 @@ export default function BloomScrollHero() {
 
     return () => {
       removeVideoTicker?.();
+      removeResizeListener?.();
+      restoreLagSmoothing?.();
       ctx.revert();
     };
   }, []);
