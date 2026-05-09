@@ -605,7 +605,7 @@ export default function BloomScrollHero() {
           z-index: 6;
           margin-left: var(--rail-w);
           margin-right: auto;
-          padding: calc(100vh + 1.5rem) clamp(1rem, 4vw, 3rem) 4rem;
+          padding: calc(50vh + 1.5rem) clamp(1rem, 4vw, 3rem) 4rem;
           max-width: 1280px;
         }
 
