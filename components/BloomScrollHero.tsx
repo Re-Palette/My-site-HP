@@ -1,6 +1,6 @@
 "use client";
 
-import { useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
@@ -12,13 +12,33 @@ gsap.registerPlugin(ScrollTrigger);
 const VIDEO_FILE = "Firefly ゆっくりと花が開花する動画 316695.mp4";
 
 export default function BloomScrollHero() {
+  const [isLoading, setIsLoading] = useState(true);
   const sectionRef = useRef<HTMLElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const loadingRef = useRef<HTMLDivElement | null>(null);
 
   useLayoutEffect(() => {
     const sectionEl = sectionRef.current;
     const videoEl = videoRef.current;
+    const loadingEl = loadingRef.current;
     if (!sectionEl || !videoEl) return;
+
+    // ロード画面のアニメーション
+    const hideLoading = () => {
+      if (loadingEl) {
+        gsap.to(loadingEl, {
+          opacity: 0,
+          duration: 1.2,
+          ease: "power2.inOut",
+          onComplete: () => {
+            setIsLoading(false);
+          }
+        });
+      }
+    };
+
+    // 2秒後にロード画面を非表示
+    const loadingTimer = setTimeout(hideLoading, 2000);
 
     let removeVideoTicker: (() => void) | undefined;
     let removeLenisRaf: (() => void) | undefined;
@@ -105,6 +125,7 @@ export default function BloomScrollHero() {
     }, sectionRef);
 
     return () => {
+      clearTimeout(loadingTimer);
       removeVideoTicker?.();
       removeLenisRaf?.();
       lenis.destroy();
@@ -115,7 +136,19 @@ export default function BloomScrollHero() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="bloom-scroll-section">
+    <>
+      {/* ロード画面 */}
+      {isLoading && (
+        <div ref={loadingRef} className="loading-screen">
+          <div className="loading-content">
+            <div className="loading-flower">❀</div>
+            <p className="loading-text">Re-Palette</p>
+            <p className="loading-sub">Beauty & Social Integration</p>
+          </div>
+        </div>
+      )}
+      
+      <section ref={sectionRef} className="bloom-scroll-section">
       {/* 動画・ヘッダー・SNS のみ固定（背景は透過で下のスクロール層が見える） */}
       <div className="sticky-visuals">
         <div className="flower-slot" aria-hidden="true">
@@ -310,6 +343,76 @@ export default function BloomScrollHero() {
       </footer>
 
       <style jsx>{`
+        /* ロード画面 */
+        .loading-screen {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          background: linear-gradient(135deg, #2a2622 0%, #181614 100%);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 9999;
+          color: #faf7ef;
+        }
+
+        .loading-content {
+          text-align: center;
+          animation: fadeInUp 1.2s ease-out;
+        }
+
+        .loading-flower {
+          font-size: 3.5rem;
+          margin-bottom: 1.5rem;
+          opacity: 0;
+          animation: bloomIn 1.5s ease-out 0.3s forwards;
+        }
+
+        .loading-text {
+          margin: 0;
+          font-size: 2rem;
+          letter-spacing: 0.15em;
+          font-weight: 300;
+          opacity: 0;
+          animation: fadeInUp 1.2s ease-out 0.6s forwards;
+        }
+
+        .loading-sub {
+          margin: 0.5rem 0 0;
+          font-size: 0.9rem;
+          letter-spacing: 0.1em;
+          opacity: 0;
+          font-family: ui-sans-serif, system-ui, sans-serif;
+          animation: fadeInUp 1.2s ease-out 0.9s forwards;
+        }
+
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes bloomIn {
+          0% {
+            opacity: 0;
+            transform: scale(0.8) rotate(-10deg);
+          }
+          50% {
+            transform: scale(1.1) rotate(5deg);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1) rotate(0deg);
+          }
+        }
+
         .bloom-scroll-section {
           position: relative;
           min-height: 430vh;
@@ -317,6 +420,17 @@ export default function BloomScrollHero() {
           font-family: "Yu Mincho", "Hiragino Mincho ProN", "Noto Serif JP", "Times New Roman", serif;
           color: #1c1916;
           --rail-w: clamp(42px, 4.2vw, 58px);
+          opacity: 0;
+          animation: siteFadeIn 1.5s ease-out 2s forwards;
+        }
+
+        @keyframes siteFadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
         }
 
         .sticky-visuals {
@@ -978,6 +1092,7 @@ export default function BloomScrollHero() {
           }
         }
       `}</style>
-    </section>
+      </section>
+    </>
   );
 }
