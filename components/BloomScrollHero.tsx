@@ -994,28 +994,30 @@ export default function BloomScrollHero() {
         }
 
         .left-rail {
-          position: absolute;
+          position: fixed;
           left: 0;
           top: 0;
           width: var(--rail-w);
-          min-height: 500vh;
-          height: 100%;
+          height: 100vh;
           background: linear-gradient(180deg, #2e2925 0%, #171513 100%);
           z-index: 5;
           display: flex;
           align-items: center;
           justify-content: center;
           box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.04);
+          overflow: hidden;
         }
 
         .left-rail-text {
           writing-mode: vertical-rl;
           text-orientation: mixed;
-          color: rgba(248, 244, 236, 0.78);
+          color: rgba(248, 244, 236, 0.9);
           font-size: 0.58rem;
           letter-spacing: 0.42em;
           text-transform: uppercase;
           font-weight: 300;
+          white-space: nowrap;
+          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
         }
 
         .scroll-inner {
@@ -1087,16 +1089,31 @@ export default function BloomScrollHero() {
 
         .btn-like {
           margin-top: 0.75rem;
-          padding: 0.32rem 1.1rem;
+          padding: 0.42rem 1.2rem;
           border: none;
-          border-radius: 2px;
+          border-radius: 3px;
           background: linear-gradient(180deg, #e8c96a 0%, #c9a24a 100%);
           color: #2a2218;
           font-size: 0.78rem;
           letter-spacing: 0.08em;
           font-family: inherit;
           cursor: pointer;
-          box-shadow: 0 2px 0 rgba(90, 70, 30, 0.25);
+          box-shadow: 0 2px 4px rgba(90, 70, 30, 0.25);
+          transition: all 0.2s ease;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .btn-like:hover {
+          background: linear-gradient(180deg, #f0d074 0%, #d6b355 100%);
+          transform: translateY(-1px);
+          box-shadow: 0 3px 6px rgba(90, 70, 30, 0.35);
+        }
+
+        .btn-like:active {
+          transform: translateY(0);
+          box-shadow: 0 1px 2px rgba(90, 70, 30, 0.25);
         }
 
         .link-more {
@@ -1107,6 +1124,13 @@ export default function BloomScrollHero() {
           letter-spacing: 0.06em;
           text-decoration: underline;
           text-underline-offset: 3px;
+          transition: all 0.2s ease;
+          white-space: nowrap;
+        }
+
+        .link-more:hover {
+          color: #8a2525;
+          text-decoration-color: #8a2525;
         }
 
         .vertical-lead {
