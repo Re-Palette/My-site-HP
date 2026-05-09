@@ -141,9 +141,24 @@ export default function BloomScrollHero() {
       {isLoading && (
         <div ref={loadingRef} className="loading-screen">
           <div className="loading-content">
-            <div className="loading-flower">❀</div>
+            <div className="loading-flower-container">
+              <div className="loading-petals">
+                <div className="petal petal-1"></div>
+                <div className="petal petal-2"></div>
+                <div className="petal petal-3"></div>
+                <div className="petal petal-4"></div>
+                <div className="petal petal-5"></div>
+                <div className="petal petal-6"></div>
+              </div>
+              <div className="loading-center">❀</div>
+            </div>
             <p className="loading-text">Re-Palette</p>
             <p className="loading-sub">Beauty & Social Integration</p>
+            <div className="loading-dots">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
           </div>
         </div>
       )}
@@ -350,48 +365,229 @@ export default function BloomScrollHero() {
           left: 0;
           width: 100vw;
           height: 100vh;
-          background: linear-gradient(135deg, #2a2622 0%, #181614 100%);
+          background:
+            radial-gradient(ellipse 130% 85% at 72% 18%, rgba(255, 253, 248, 0.97) 0%, transparent 52%),
+            linear-gradient(168deg, #faf7ef 0%, #f4ebe2 40%, #efe6da 100%);
           display: flex;
           align-items: center;
           justify-content: center;
           z-index: 9999;
-          color: #faf7ef;
+          color: #1c1916;
+          overflow: hidden;
+        }
+
+        .loading-screen::before {
+          content: '';
+          position: absolute;
+          top: -10%;
+          left: 10%;
+          width: 50vmin;
+          height: 46vmin;
+          background: radial-gradient(
+            circle at 38% 38%,
+            rgba(165, 82, 68, 0.26) 0%,
+            rgba(130, 62, 48, 0.12) 42%,
+            transparent 70%
+          );
+          filter: blur(26px);
+          pointer-events: none;
+          animation: floatGentle 8s ease-in-out infinite;
+        }
+
+        .loading-screen::after {
+          content: '';
+          position: absolute;
+          bottom: -16%;
+          right: 10%;
+          width: 62vmin;
+          height: 48vmin;
+          background:
+            radial-gradient(ellipse at 28% 52%, rgba(252, 252, 250, 0.9) 0%, transparent 48%),
+            radial-gradient(ellipse at 42% 68%, rgba(88, 112, 74, 0.13) 0%, transparent 58%);
+          filter: blur(28px);
+          pointer-events: none;
+          animation: floatGentle 10s ease-in-out infinite reverse;
         }
 
         .loading-content {
           text-align: center;
-          animation: fadeInUp 1.2s ease-out;
+          animation: contentFadeIn 2s ease-out;
+          position: relative;
+          z-index: 1;
         }
 
-        .loading-flower {
-          font-size: 3.5rem;
-          margin-bottom: 1.5rem;
+        .loading-flower-container {
+          position: relative;
+          width: 120px;
+          height: 120px;
+          margin: 0 auto 2rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .loading-petals {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          animation: rotateSlow 20s linear infinite;
+        }
+
+        .petal {
+          position: absolute;
+          width: 40px;
+          height: 40px;
+          background: linear-gradient(135deg, #e8c96a 0%, #c9a24a 100%);
+          border-radius: 0 50% 50% 50%;
+          transform-origin: bottom right;
           opacity: 0;
-          animation: bloomIn 1.5s ease-out 0.3s forwards;
+          animation: bloomPetal 2s ease-out forwards;
+          box-shadow: 0 4px 12px rgba(200, 150, 70, 0.3);
+        }
+
+        .petal-1 {
+          top: 10px;
+          left: 50%;
+          transform: translateX(-50%) rotate(0deg);
+          animation-delay: 0.1s;
+        }
+
+        .petal-2 {
+          top: 30px;
+          right: 15px;
+          transform: rotate(60deg);
+          animation-delay: 0.2s;
+        }
+
+        .petal-3 {
+          bottom: 30px;
+          right: 15px;
+          transform: rotate(120deg);
+          animation-delay: 0.3s;
+        }
+
+        .petal-4 {
+          bottom: 10px;
+          left: 50%;
+          transform: translateX(-50%) rotate(180deg);
+          animation-delay: 0.4s;
+        }
+
+        .petal-5 {
+          bottom: 30px;
+          left: 15px;
+          transform: rotate(240deg);
+          animation-delay: 0.5s;
+        }
+
+        .petal-6 {
+          top: 30px;
+          left: 15px;
+          transform: rotate(300deg);
+          animation-delay: 0.6s;
+        }
+
+        .loading-center {
+          font-size: 2.5rem;
+          opacity: 0;
+          animation: centerBloom 1.5s ease-out 0.8s forwards;
+          filter: drop-shadow(0 2px 8px rgba(26, 23, 20, 0.2));
         }
 
         .loading-text {
           margin: 0;
-          font-size: 2rem;
+          font-size: 2.5rem;
           letter-spacing: 0.15em;
           font-weight: 300;
           opacity: 0;
-          animation: fadeInUp 1.2s ease-out 0.6s forwards;
+          animation: textFadeIn 1.2s ease-out 1.2s forwards;
+          font-family: "Yu Mincho", "Hiragino Mincho ProN", "Noto Serif JP", serif;
+          background: linear-gradient(135deg, #a67c52 0%, #2a2622 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
         }
 
         .loading-sub {
-          margin: 0.5rem 0 0;
+          margin: 0.5rem 0 1.5rem;
           font-size: 0.9rem;
           letter-spacing: 0.1em;
           opacity: 0;
           font-family: ui-sans-serif, system-ui, sans-serif;
-          animation: fadeInUp 1.2s ease-out 0.9s forwards;
+          animation: textFadeIn 1.2s ease-out 1.4s forwards;
+          color: #666;
+          font-weight: 400;
         }
 
-        @keyframes fadeInUp {
+        .loading-dots {
+          display: flex;
+          justify-content: center;
+          gap: 8px;
+          opacity: 0;
+          animation: textFadeIn 1.2s ease-out 1.6s forwards;
+        }
+
+        .loading-dots span {
+          width: 8px;
+          height: 8px;
+          background: linear-gradient(135deg, #e8c96a 0%, #c9a24a 100%);
+          border-radius: 50%;
+          animation: dotPulse 1.5s ease-in-out infinite;
+        }
+
+        .loading-dots span:nth-child(2) {
+          animation-delay: 0.2s;
+        }
+
+        .loading-dots span:nth-child(3) {
+          animation-delay: 0.4s;
+        }
+
+        @keyframes contentFadeIn {
           from {
             opacity: 0;
-            transform: translateY(30px);
+            transform: scale(0.9);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+
+        @keyframes bloomPetal {
+          0% {
+            opacity: 0;
+            transform: scale(0) rotate(var(--rotation, 0deg));
+          }
+          50% {
+            opacity: 0.8;
+            transform: scale(1.1) rotate(calc(var(--rotation, 0deg) + 10deg));
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1) rotate(var(--rotation, 0deg));
+          }
+        }
+
+        @keyframes centerBloom {
+          0% {
+            opacity: 0;
+            transform: scale(0) rotate(-180deg);
+          }
+          50% {
+            opacity: 0.8;
+            transform: scale(1.2) rotate(10deg);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1) rotate(0deg);
+          }
+        }
+
+        @keyframes textFadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
           }
           to {
             opacity: 1;
@@ -399,17 +595,35 @@ export default function BloomScrollHero() {
           }
         }
 
-        @keyframes bloomIn {
-          0% {
-            opacity: 0;
-            transform: scale(0.8) rotate(-10deg);
+        @keyframes dotPulse {
+          0%, 100% {
+            transform: scale(1);
+            opacity: 0.6;
           }
           50% {
-            transform: scale(1.1) rotate(5deg);
-          }
-          100% {
+            transform: scale(1.3);
             opacity: 1;
-            transform: scale(1) rotate(0deg);
+          }
+        }
+
+        @keyframes rotateSlow {
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
+        }
+
+        @keyframes floatGentle {
+          0%, 100% {
+            transform: translateY(0) translateX(0);
+          }
+          33% {
+            transform: translateY(-20px) translateX(10px);
+          }
+          66% {
+            transform: translateY(10px) translateX(-10px);
           }
         }
 
