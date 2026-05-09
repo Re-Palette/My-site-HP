@@ -15,6 +15,7 @@ export default function BloomScrollHero() {
   const [isLoading, setIsLoading] = useState(true);
   const sectionRef = useRef<HTMLElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const loadingRef = useRef<HTMLDivElement | null>(null);
 
   useLayoutEffect(() => {
@@ -70,44 +71,132 @@ export default function BloomScrollHero() {
         videoSyncReady = true;
 
         videoEl.pause();
+        videoEl.playbackRate = 1.0;
 
-        const scrollProgressForSection = () => {
-          const sectionH = sectionEl.offsetHeight;
-          const vh = window.innerHeight;
-          const denom = Math.max(1e-6, sectionH - vh);
-          const top = sectionEl.getBoundingClientRect().top;
-          return gsap.utils.clamp(0, 1, -top / denom);
+        // パフォーマンス最適化用の変数
+        let smoothTime = 0;
+        let targetTime = 0;
+        let lastScrollTop = 0;
+        let isScrolling = false;
+        let scrollTimeout: NodeJS.Timeout;
+        const activeRange = 0.84;
+        const smoothingFactor = 0.12; // イージング係数
+        const threshold = 1 / 60; // 60fps基準の閾値
+
+        // スクロール進行率を計算（キャッシュ付き）
+        const cachedDimensions = { sectionH: 0, vh: 0, denom: 0 };
+        const updateDimensions = () => {
+          cachedDimensions.sectionH = sectionEl.offsetHeight;
+          cachedDimensions.vh = window.innerHeight;
+          cachedDimensions.denom = Math.max(1e-6, cachedDimensions.sectionH - cachedDimensions.vh);
         };
 
-        let smoothTime = 0;
-        const activeRange = 0.84;
+        const scrollProgressForSection = () => {
+          const top = sectionEl.getBoundingClientRect().top;
+          return gsap.utils.clamp(0, 1, -top / cachedDimensions.denom);
+        };
 
-        const syncVideoToScroll = () => {
-          const progress = scrollProgressForSection();
-          const mapped = gsap.utils.clamp(0, 1, progress / activeRange);
-          const target = mapped * duration;
-          const blend = 1 - Math.pow(0.72, gsap.ticker.deltaRatio());
-          smoothTime += (target - smoothTime) * Math.min(1, blend * 1.35);
-          const seek = gsap.utils.clamp(0, duration, smoothTime);
-          if (Math.abs(videoEl.currentTime - seek) > 1 / 200) {
-            videoEl.currentTime = seek;
+        // Canvas描画用の変数
+        const canvasEl = canvasRef.current;
+        const ctx = canvasEl?.getContext('2d');
+        let isVideoReady = false;
+
+        // 動画の準備が完了したらCanvas描画を開始
+        const setupCanvas = () => {
+          if (!canvasEl || !ctx || !videoEl) return;
+          
+          canvasEl.width = videoEl.videoWidth || 1920;
+          canvasEl.height = videoEl.videoHeight || 1080;
+          isVideoReady = true;
+        };
+
+        // Canvasに動画を描画する関数
+        const drawVideoToCanvas = () => {
+          if (!isVideoReady || !ctx || !videoEl) return;
+          
+          try {
+            ctx.drawImage(videoEl, 0, 0, canvasEl.width, canvasEl.height);
+          } catch (e) {
+            // 動画がまだ準備できていない場合
+            console.log('Canvas draw error:', e);
           }
         };
 
-        gsap.ticker.add(syncVideoToScroll);
-        removeVideoTicker = () => gsap.ticker.remove(syncVideoToScroll);
+        // 最適化された動画同期関数
+        const syncVideoToScroll = () => {
+          if (!isScrolling) return;
 
-        gsap.ticker.lagSmoothing(0);
-        restoreLagSmoothing = () => gsap.ticker.lagSmoothing(500, 33);
+          const currentScrollTop = window.pageYOffset || document.documentElement.scrollTop;
+          
+          // スクロール方向を検出して最適化
+          const scrollDelta = Math.abs(currentScrollTop - lastScrollTop);
+          if (scrollDelta < 0.5) {
+            lastScrollTop = currentScrollTop;
+            return; // 微小なスクロールは無視
+          }
+          lastScrollTop = currentScrollTop;
 
-        ScrollTrigger.refresh();
+          const progress = scrollProgressForSection();
+          const mapped = gsap.utils.clamp(0, 1, progress / activeRange);
+          targetTime = mapped * duration;
+
+          // 高度なイージング（スムージング）
+          const deltaTime = gsap.ticker.deltaRatio();
+          const adaptiveSmoothing = Math.min(1, deltaTime * smoothingFactor * 2);
+          smoothTime += (targetTime - smoothTime) * adaptiveSmoothing;
+
+          const seek = gsap.utils.clamp(0, duration, smoothTime);
+          
+          // 最適化されたcurrentTime更新
+          if (Math.abs(videoEl.currentTime - seek) > threshold) {
+            videoEl.currentTime = seek;
+          }
+
+          // Canvas描画
+          drawVideoToCanvas();
+        };
+
+        // requestAnimationFrameベースの更新ループ
+        let rafId: number;
+        const updateLoop = () => {
+          syncVideoToScroll();
+          rafId = requestAnimationFrame(updateLoop);
+        };
+
+        // スクロールイベントの最適化
+        const handleScroll = () => {
+          isScrolling = true;
+          clearTimeout(scrollTimeout);
+          scrollTimeout = setTimeout(() => {
+            isScrolling = false;
+          }, 150); // スクロール停止検出
+        };
+
+        // 初期化
+        updateDimensions();
+        setupCanvas();
+        gsap.ticker.add(updateLoop);
+        removeVideoTicker = () => {
+          cancelAnimationFrame(rafId);
+          gsap.ticker.remove(updateLoop);
+        };
+
+        // イベントリスナー
+        window.addEventListener("scroll", handleScroll, { passive: true });
+        const onResize = () => {
+          updateDimensions();
+          ScrollTrigger.refresh();
+        };
+        window.addEventListener("resize", onResize, { passive: true });
+        removeResizeListener = () => {
+          window.removeEventListener("scroll", handleScroll);
+          window.removeEventListener("resize", onResize);
+          clearTimeout(scrollTimeout);
+        };
+
+        // 初期シーク
         smoothTime = scrollProgressForSection() * duration;
         videoEl.currentTime = smoothTime;
-        syncVideoToScroll();
-
-        const onResize = () => ScrollTrigger.refresh();
-        window.addEventListener("resize", onResize);
-        removeResizeListener = () => window.removeEventListener("resize", onResize);
       };
 
       if (videoEl.readyState >= 1) {
@@ -175,6 +264,12 @@ export default function BloomScrollHero() {
               muted
               playsInline
               preload="auto"
+              style={{ display: 'none' }}
+            />
+            <canvas
+              ref={canvasRef}
+              className="bloom-canvas"
+              style={{ width: '100%', height: '100%' }}
             />
           </div>
           <div className="flower-soft-edge" aria-hidden="true" />
@@ -359,12 +454,6 @@ export default function BloomScrollHero() {
           </aside>
 
           </div>
-      </div>
-
-      <div className="closing-section">
-        <p className="closing-line">
-          Beauty &amp; Social Integration — 内なる輝きを、社会とともにひらいていく。
-        </p>
       </div>
 
       <footer className="site-footer">
@@ -721,6 +810,17 @@ export default function BloomScrollHero() {
         }
 
         .bloom-video {
+          position: absolute;
+          inset: -7%;
+          width: 114%;
+          height: 114%;
+          object-fit: cover;
+          object-position: 50% 46%;
+          filter: saturate(1.03) contrast(1.03) brightness(1.01);
+          display: none;
+        }
+
+        .bloom-canvas {
           position: absolute;
           inset: -7%;
           width: 114%;
