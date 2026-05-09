@@ -6,6 +6,8 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
+const VIDEO_FILE = "Firefly ゆっくりと花が開花する動画 316695.mp4";
+
 export default function BloomScrollHero() {
   const sectionRef = useRef<HTMLElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -92,7 +94,9 @@ export default function BloomScrollHero() {
               <video
                 ref={videoRef}
                 className="bloom-video"
-                src="/Firefly ゆっくりと花が開花する動画 316695.mp4"
+                src={encodeURI(
+                  `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/${VIDEO_FILE}`
+                )}
                 muted
                 playsInline
                 preload="auto"
