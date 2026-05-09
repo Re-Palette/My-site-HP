@@ -14,13 +14,11 @@ const VIDEO_FILE = "Firefly ゆっくりと花が開花する動画 316695.mp4";
 export default function BloomScrollHero() {
   const sectionRef = useRef<HTMLElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const heroTextRef = useRef<HTMLDivElement | null>(null);
 
   useLayoutEffect(() => {
     const sectionEl = sectionRef.current;
     const videoEl = videoRef.current;
-    const heroTextEl = heroTextRef.current;
-    if (!sectionEl || !videoEl || !heroTextEl) return;
+    if (!sectionEl || !videoEl) return;
 
     let removeVideoTicker: (() => void) | undefined;
     let removeLenisRaf: (() => void) | undefined;
@@ -79,22 +77,6 @@ export default function BloomScrollHero() {
         gsap.ticker.lagSmoothing(0);
         restoreLagSmoothing = () => gsap.ticker.lagSmoothing(500, 33);
 
-        gsap.fromTo(
-          heroTextEl,
-          { opacity: 0.35, y: 28 },
-          {
-            opacity: 1,
-            y: 0,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: sectionEl,
-              start: "top 58%",
-              end: "top 18%",
-              scrub: true,
-            },
-          }
-        );
-
         ScrollTrigger.refresh();
         smoothTime = scrollProgressForSection() * duration;
         videoEl.currentTime = smoothTime;
@@ -131,55 +113,20 @@ export default function BloomScrollHero() {
 
   return (
     <section ref={sectionRef} className="bloom-scroll-section">
-      <div className="bloom-sticky-stage">
-        <div className="cream-bg" aria-hidden="true" />
-        <div className="accent-maple" aria-hidden="true" />
-        <div className="accent-garden" aria-hidden="true" />
-
-        <div className="left-rail" aria-hidden="true">
-          <span className="left-rail-text">Re-Palette</span>
-        </div>
-
-        <MomijiLayer />
-
-        <div className="hero-content">
-          <div className="flower-slot" aria-hidden="true">
-            <div className="flower-mask">
-              <video
-                ref={videoRef}
-                className="bloom-video"
-                src={encodeURI(
-                  `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/${VIDEO_FILE}`
-                )}
-                muted
-                playsInline
-                preload="auto"
-              />
-            </div>
-            <div className="flower-soft-edge" aria-hidden="true" />
+      {/* 動画・ヘッダー・SNS のみ固定（背景は透過で下のスクロール層が見える） */}
+      <div className="sticky-visuals">
+        <div className="flower-slot" aria-hidden="true">
+          <div className="flower-mask">
+            <video
+              ref={videoRef}
+              className="bloom-video"
+              src={encodeURI(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/${VIDEO_FILE}`)}
+              muted
+              playsInline
+              preload="auto"
+            />
           </div>
-
-          <div className="right-stack">
-            <div ref={heroTextRef} className="hero-copy">
-              <p className="vertical-lead">内なる輝きが、今ひらく。</p>
-              <div className="english-stack">
-                <p className="english-line">EMPOWERMENT THROUGH BEAUTY</p>
-                <p className="english-line muted">Your Inner Radiance,</p>
-                <p className="english-line small">SOCIAL REINTEGRATION THROUGH SUPPORT.</p>
-              </div>
-            </div>
-
-            <aside className="paper-card card-right">
-              <div className="paper-icon steps" aria-hidden="true" />
-              <p className="paper-title">SOCIAL STEPPING STONES</p>
-              <p className="paper-body">
-                Gentle steps back into connection—paced for you, supported at every landing.
-              </p>
-              <a href="#" className="link-more">
-                Link more
-              </a>
-            </aside>
-          </div>
+          <div className="flower-soft-edge" aria-hidden="true" />
         </div>
 
         <header className="top-bar">
@@ -203,17 +150,6 @@ export default function BloomScrollHero() {
           </nav>
         </header>
 
-        <aside className="paper-card card-left">
-          <div className="paper-icon mindful" aria-hidden="true" />
-          <p className="paper-title">MINDFUL BEAUTY</p>
-          <p className="paper-body">
-            Calm, intentional care that lets your presence settle and brighten—without rushing the bloom.
-          </p>
-          <button type="button" className="btn-like">
-            Like
-          </button>
-        </aside>
-
         <div className="social-rail" aria-hidden="true">
           <span>f</span>
           <span>𝕏</span>
@@ -221,97 +157,124 @@ export default function BloomScrollHero() {
         </div>
       </div>
 
+      {/* スクロールで流れる通常コンテンツ */}
+      <div className="scroll-doc">
+        <div className="scroll-cream" aria-hidden="true" />
+        <div className="accent-maple" aria-hidden="true" />
+        <div className="accent-garden" aria-hidden="true" />
+
+        <div className="left-rail" aria-hidden="true">
+          <span className="left-rail-text">Re-Palette</span>
+        </div>
+
+        <MomijiLayer />
+
+        <div className="scroll-inner">
+          <aside className="paper-card card-left">
+            <div className="paper-icon mindful" aria-hidden="true" />
+            <p className="paper-title">MINDFUL BEAUTY</p>
+            <p className="paper-body">
+              Calm, intentional care that lets your presence settle and brighten—without rushing the bloom.
+            </p>
+            <button type="button" className="btn-like">
+              Like
+            </button>
+          </aside>
+
+          <div className="hero-band">
+            <div className="hero-band-spacer" aria-hidden="true" />
+            <div className="right-stack">
+              <div className="hero-copy">
+                <p className="vertical-lead">内なる輝きが、今ひらく。</p>
+                <div className="english-stack">
+                  <p className="english-line">EMPOWERMENT THROUGH BEAUTY</p>
+                  <p className="english-line muted">Your Inner Radiance,</p>
+                  <p className="english-line small">SOCIAL REINTEGRATION THROUGH SUPPORT.</p>
+                </div>
+              </div>
+              <aside className="paper-card card-right">
+                <div className="paper-icon steps" aria-hidden="true" />
+                <p className="paper-title">SOCIAL STEPPING STONES</p>
+                <p className="paper-body">
+                  Gentle steps back into connection—paced for you, supported at every landing.
+                </p>
+                <a href="#" className="link-more">
+                  Link more
+                </a>
+              </aside>
+            </div>
+          </div>
+
+          <div className="quote-row">
+            <blockquote className="quote-card">
+              <p className="quote-text">「美しさは、戻るための地図になる。」</p>
+              <cite className="quote-from">Re-Palette Philosophy</cite>
+            </blockquote>
+            <div className="stat-card">
+              <p className="stat-num">01</p>
+              <p className="stat-label">Mindful Session</p>
+              <p className="stat-desc">呼吸とペースを整え、自分のリズムを取り戻す時間。</p>
+            </div>
+            <div className="stat-card dim">
+              <p className="stat-num">02</p>
+              <p className="stat-label">Community Bridge</p>
+              <p className="stat-desc">小さな対話から、社会とのつながりをそっと広げます。</p>
+            </div>
+          </div>
+
+          <div className="band-labels">
+            <span className="pill">Presence</span>
+            <span className="pill">Gentle Pace</span>
+            <span className="pill">Dignity</span>
+            <span className="pill">Support</span>
+          </div>
+
+          <div className="split-cards">
+            <div className="mini-card">
+              <h3 className="mini-title">Program</h3>
+              <p className="mini-body">少人数・安心の環境で、段階的に参加の幅を広げるプログラムをご用意しています。</p>
+              <a className="mini-link" href="#">
+                詳しく見る
+              </a>
+            </div>
+            <div className="mini-card outline">
+              <h3 className="mini-title">Contact</h3>
+              <p className="mini-body">ご相談・見学のご希望は、お気軽にお問い合わせください。専門スタッフが丁寧にお答えします。</p>
+              <a className="mini-link" href="#">
+                お問い合わせ
+              </a>
+            </div>
+          </div>
+
+          <p className="closing-line">
+            Beauty &amp; Social Integration — 内なる輝きを、社会とともにひらいていく。
+          </p>
+        </div>
+      </div>
+
       <style jsx>{`
         .bloom-scroll-section {
           position: relative;
-          height: 500vh;
+          min-height: 500vh;
           overflow: clip;
           font-family: "Yu Mincho", "Hiragino Mincho ProN", "Noto Serif JP", "Times New Roman", serif;
           color: #1c1916;
+          --rail-w: clamp(42px, 4.2vw, 58px);
         }
 
-        .bloom-sticky-stage {
+        .sticky-visuals {
           position: sticky;
           top: 0;
           height: 100vh;
           width: 100%;
-          isolation: isolate;
-          overflow: hidden;
-          --rail-w: clamp(42px, 4.2vw, 58px);
-        }
-
-        .cream-bg {
-          position: absolute;
-          inset: 0;
-          background:
-            radial-gradient(ellipse 130% 85% at 72% 18%, rgba(255, 253, 248, 0.97) 0%, transparent 52%),
-            linear-gradient(168deg, #faf7ef 0%, #f4ebe2 40%, #efe6da 100%);
-          z-index: 0;
-        }
-
-        .accent-maple {
-          position: absolute;
-          top: -10%;
-          left: calc(var(--rail-w) - 12px);
-          width: 50vmin;
-          height: 46vmin;
-          background: radial-gradient(
-            circle at 38% 38%,
-            rgba(165, 82, 68, 0.26) 0%,
-            rgba(130, 62, 48, 0.12) 42%,
-            transparent 70%
-          );
-          filter: blur(26px);
-          z-index: 0;
-        }
-
-        .accent-garden {
-          position: absolute;
-          bottom: -16%;
-          left: calc(var(--rail-w) - 6%);
-          width: 62vmin;
-          height: 48vmin;
-          background:
-            radial-gradient(ellipse at 28% 52%, rgba(252, 252, 250, 0.9) 0%, transparent 48%),
-            radial-gradient(ellipse at 42% 68%, rgba(88, 112, 74, 0.13) 0%, transparent 58%);
-          filter: blur(28px);
-          z-index: 0;
-        }
-
-        .left-rail {
-          position: absolute;
-          left: 0;
-          top: 0;
-          bottom: 0;
-          width: var(--rail-w);
-          background: linear-gradient(180deg, #2e2925 0%, #171513 100%);
-          z-index: 6;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.04);
-        }
-
-        .left-rail-text {
-          writing-mode: vertical-rl;
-          text-orientation: mixed;
-          color: rgba(248, 244, 236, 0.78);
-          font-size: 0.58rem;
-          letter-spacing: 0.42em;
-          text-transform: uppercase;
-          font-weight: 300;
-        }
-
-        .hero-content {
-          position: absolute;
-          inset: 0;
-          left: var(--rail-w);
-          z-index: 2;
+          z-index: 30;
           pointer-events: none;
+          isolation: isolate;
         }
 
-        .hero-content .flower-slot,
-        .hero-content .right-stack {
+        .sticky-visuals .top-bar,
+        .sticky-visuals .top-bar a,
+        .sticky-visuals .social-rail span {
           pointer-events: auto;
         }
 
@@ -320,27 +283,10 @@ export default function BloomScrollHero() {
           left: 50%;
           top: 50%;
           transform: translate(-50%, -50%);
-          z-index: 4;
+          z-index: 2;
           display: flex;
           align-items: center;
           justify-content: center;
-        }
-
-        .right-stack {
-          position: absolute;
-          top: clamp(5.85rem, 12.5vh, 8.75rem);
-          right: clamp(2.5rem, 4.5vw, 3.75rem);
-          bottom: clamp(1rem, 3.5vh, 2rem);
-          width: min(278px, calc(26vw + 8px));
-          display: flex;
-          flex-direction: column;
-          align-items: stretch;
-          gap: clamp(1.25rem, 3.6vh, 2.25rem);
-          z-index: 8;
-        }
-
-        .right-stack .card-right {
-          margin-top: auto;
         }
 
         .flower-mask {
@@ -390,20 +336,300 @@ export default function BloomScrollHero() {
           opacity: 0.38;
         }
 
-        .hero-copy {
+        .top-bar {
+          position: absolute;
+          top: clamp(0.9rem, 2.2vw, 1.75rem);
+          left: var(--rail-w);
+          right: 0;
+          padding: 0 clamp(1rem, 3vw, 2.25rem);
+          display: grid;
+          grid-template-columns: 1fr auto 1fr;
+          align-items: flex-start;
+          z-index: 7;
+        }
+
+        .brand-center {
+          grid-column: 2;
+          justify-self: center;
+          display: flex;
+          flex-direction: row;
+          gap: 0.55rem;
+          align-items: flex-start;
+          text-align: left;
+          margin-top: 0.1rem;
+        }
+
+        .brand-center .brand-icon {
+          font-size: 1.15rem;
+          line-height: 1;
+          opacity: 0.72;
+        }
+
+        .brand-title {
+          margin: 0;
+          font-size: clamp(1.05rem, 2.1vw, 1.62rem);
+          letter-spacing: 0.08em;
+          font-weight: 400;
+        }
+
+        .brand-sub {
+          margin: 0.12rem 0 0;
+          font-size: 0.66rem;
+          letter-spacing: 0.06em;
+          opacity: 0.74;
+          font-weight: 300;
+        }
+
+        .top-nav {
+          grid-column: 3;
+          justify-self: end;
+          align-self: start;
+          padding-top: 0.35rem;
+          display: flex;
+          align-items: center;
+          gap: 0.42rem;
+          font-family: ui-sans-serif, system-ui, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+          font-size: 0.66rem;
+          letter-spacing: 0.13em;
+        }
+
+        .top-nav a {
+          color: #1a1714;
+          text-decoration: none;
+          font-weight: 500;
+        }
+
+        .top-nav a:hover {
+          opacity: 0.65;
+        }
+
+        .nav-sep {
+          opacity: 0.28;
+          user-select: none;
+          font-weight: 300;
+        }
+
+        .social-rail {
+          position: absolute;
+          right: clamp(0.35rem, 0.95vw, 0.7rem);
+          top: 50%;
+          transform: translateY(-38%);
+          z-index: 9;
+          display: flex;
+          flex-direction: column;
+          gap: 0.95rem;
+          font-family: ui-sans-serif, system-ui, sans-serif;
+          font-size: 0.68rem;
+          font-weight: 500;
+          color: rgba(26, 23, 20, 0.48);
+        }
+
+        .social-rail span {
+          width: 22px;
+          height: 22px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border: 1px solid rgba(26, 23, 20, 0.14);
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.55);
+          backdrop-filter: blur(4px);
+        }
+
+        /* スクロール文書層 */
+        .scroll-doc {
           position: relative;
-          left: auto;
-          top: auto;
-          transform: none;
-          z-index: 1;
+          margin-top: -100vh;
+          min-height: 500vh;
+          z-index: 10;
+          --rail-w: clamp(42px, 4.2vw, 58px);
+        }
+
+        .scroll-cream {
+          position: absolute;
+          inset: 0;
+          min-height: 100%;
+          background:
+            radial-gradient(ellipse 130% 85% at 72% 18%, rgba(255, 253, 248, 0.97) 0%, transparent 52%),
+            linear-gradient(168deg, #faf7ef 0%, #f4ebe2 40%, #efe6da 100%);
+          z-index: 0;
+        }
+
+        .accent-maple {
+          position: absolute;
+          top: -10%;
+          left: calc(var(--rail-w) - 12px);
+          width: 50vmin;
+          height: 46vmin;
+          background: radial-gradient(
+            circle at 38% 38%,
+            rgba(165, 82, 68, 0.26) 0%,
+            rgba(130, 62, 48, 0.12) 42%,
+            transparent 70%
+          );
+          filter: blur(26px);
+          z-index: 0;
+          pointer-events: none;
+        }
+
+        .accent-garden {
+          position: absolute;
+          bottom: -16%;
+          left: calc(var(--rail-w) - 6%);
+          width: 62vmin;
+          height: 48vmin;
+          background:
+            radial-gradient(ellipse at 28% 52%, rgba(252, 252, 250, 0.9) 0%, transparent 48%),
+            radial-gradient(ellipse at 42% 68%, rgba(88, 112, 74, 0.13) 0%, transparent 58%);
+          filter: blur(28px);
+          z-index: 0;
+          pointer-events: none;
+        }
+
+        .left-rail {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: var(--rail-w);
+          min-height: 500vh;
+          height: 100%;
+          background: linear-gradient(180deg, #2e2925 0%, #171513 100%);
+          z-index: 5;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.04);
+        }
+
+        .left-rail-text {
+          writing-mode: vertical-rl;
+          text-orientation: mixed;
+          color: rgba(248, 244, 236, 0.78);
+          font-size: 0.58rem;
+          letter-spacing: 0.42em;
+          text-transform: uppercase;
+          font-weight: 300;
+        }
+
+        .scroll-inner {
+          position: relative;
+          z-index: 6;
+          margin-left: var(--rail-w);
+          margin-right: auto;
+          padding: clamp(5.5rem, 14vh, 8.5rem) clamp(1rem, 4vw, 3rem) 4rem;
+          max-width: 1280px;
+        }
+
+        .paper-card {
+          width: min(292px, 88vw);
+          padding: 1.05rem 1.2rem 0.95rem;
+          background: rgba(255, 254, 252, 0.94);
+          color: #161412;
+          border: 1px solid rgba(198, 188, 172, 0.55);
+          box-shadow: 0 22px 48px rgba(48, 40, 32, 0.1), 0 2px 0 rgba(255, 255, 255, 0.65) inset;
+        }
+
+        .card-left {
+          transform: rotate(-1.4deg);
+          margin-bottom: 2.5rem;
+        }
+
+        .paper-icon {
+          width: 34px;
+          height: 34px;
+          margin-bottom: 0.5rem;
+          border-radius: 50%;
+          border: 1px solid rgba(22, 20, 18, 0.08);
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+        }
+
+        .paper-icon.mindful {
+          background:
+            radial-gradient(circle at 45% 42%, rgba(230, 198, 118, 0.45) 0%, transparent 58%),
+            linear-gradient(165deg, #fdfcfa 0%, #f3ebe3 100%);
+        }
+
+        .paper-icon.steps {
+          background: linear-gradient(
+              180deg,
+              transparent 0%,
+              transparent 38%,
+              rgba(22, 20, 18, 0.07) 38%,
+              rgba(22, 20, 18, 0.07) 62%,
+              transparent 62%
+            ),
+            linear-gradient(165deg, #fdfcfa 0%, #f3ebe3 100%);
+        }
+
+        .paper-title {
+          margin: 0;
+          font-size: 0.98rem;
+          letter-spacing: 0.045em;
+          font-weight: 500;
+        }
+
+        .paper-body {
+          margin: 0.6rem 0 0;
+          line-height: 1.58;
+          font-size: 0.8rem;
+          opacity: 0.84;
+        }
+
+        .btn-like {
+          margin-top: 0.75rem;
+          padding: 0.32rem 1.1rem;
+          border: none;
+          border-radius: 2px;
+          background: linear-gradient(180deg, #e8c96a 0%, #c9a24a 100%);
+          color: #2a2218;
+          font-size: 0.78rem;
+          letter-spacing: 0.08em;
+          font-family: inherit;
+          cursor: pointer;
+          box-shadow: 0 2px 0 rgba(90, 70, 30, 0.25);
+        }
+
+        .link-more {
+          margin-top: 0.65rem;
+          display: inline-block;
+          font-size: 0.8rem;
+          color: #b03030;
+          letter-spacing: 0.06em;
+          text-decoration: underline;
+          text-underline-offset: 3px;
+        }
+
+        .hero-band {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: flex-end;
+          gap: 2rem;
+          margin-bottom: 3rem;
+          min-height: 42vh;
+        }
+
+        .hero-band-spacer {
+          flex: 1 1 200px;
+          min-width: min(42vmin, 280px);
+          min-height: 120px;
+        }
+
+        .right-stack {
+          flex: 0 1 min(278px, 32vw);
+          display: flex;
+          flex-direction: column;
+          gap: clamp(1.25rem, 3vh, 2rem);
+        }
+
+        .card-right {
+          transform: rotate(0.65deg);
+        }
+
+        .hero-copy {
           display: flex;
           flex-direction: row;
           align-items: flex-start;
-          justify-content: flex-start;
           gap: clamp(0.7rem, 1.8vw, 1.2rem);
-          padding-top: 0;
-          opacity: 0.96;
-          max-width: 100%;
         }
 
         .vertical-lead {
@@ -447,248 +673,165 @@ export default function BloomScrollHero() {
           line-height: 1.55;
         }
 
-        .top-bar {
-          position: absolute;
-          top: clamp(0.9rem, 2.2vw, 1.75rem);
-          left: var(--rail-w);
-          right: 0;
-          padding: 0 clamp(1rem, 3vw, 2.25rem);
+        .quote-row {
           display: grid;
-          grid-template-columns: 1fr auto 1fr;
-          align-items: flex-start;
-          z-index: 7;
-          pointer-events: none;
+          grid-template-columns: 1.4fr 1fr 1fr;
+          gap: 1.25rem;
+          margin-bottom: 2.5rem;
+          align-items: stretch;
         }
 
-        .brand-center {
-          grid-column: 2;
-          justify-self: center;
-          display: flex;
-          flex-direction: row;
-          gap: 0.55rem;
-          align-items: flex-start;
-          text-align: left;
-          pointer-events: auto;
-          margin-top: 0.1rem;
-        }
-
-        .brand-center .brand-icon {
-          font-size: 1.15rem;
-          line-height: 1;
-          opacity: 0.72;
-          letter-spacing: 0;
-        }
-
-        .brand-title {
+        .quote-card {
           margin: 0;
-          font-size: clamp(1.05rem, 2.1vw, 1.62rem);
-          letter-spacing: 0.08em;
-          font-weight: 400;
+          padding: 1.35rem 1.5rem;
+          background: rgba(255, 255, 255, 0.72);
+          border: 1px solid rgba(198, 188, 172, 0.45);
+          border-radius: 2px;
+          box-shadow: 0 12px 32px rgba(48, 40, 32, 0.06);
         }
 
-        .brand-sub {
-          margin: 0.12rem 0 0;
-          font-size: 0.66rem;
+        .quote-text {
+          margin: 0;
+          font-size: clamp(0.95rem, 1.6vw, 1.15rem);
+          line-height: 1.75;
           letter-spacing: 0.06em;
-          opacity: 0.74;
-          font-weight: 300;
         }
 
-        .top-nav {
-          grid-column: 3;
-          justify-self: end;
-          align-self: start;
-          padding-top: 0.35rem;
-          display: flex;
-          align-items: center;
-          gap: 0.42rem;
-          font-family: ui-sans-serif, system-ui, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-          font-size: 0.66rem;
-          letter-spacing: 0.13em;
-          pointer-events: auto;
-        }
-
-        .top-nav a {
-          color: #1a1714;
-          text-decoration: none;
-          font-weight: 500;
-        }
-
-        .top-nav a:hover {
+        .quote-from {
+          display: block;
+          margin-top: 1rem;
+          font-size: 0.72rem;
+          letter-spacing: 0.14em;
+          font-style: normal;
           opacity: 0.65;
         }
 
-        .nav-sep {
-          opacity: 0.28;
-          user-select: none;
-          font-weight: 300;
+        .stat-card {
+          padding: 1.2rem 1.15rem;
+          background: rgba(255, 254, 252, 0.88);
+          border: 1px solid rgba(198, 188, 172, 0.5);
+          box-shadow: 0 10px 28px rgba(48, 40, 32, 0.07);
         }
 
-        .paper-card {
-          position: absolute;
-          z-index: 7;
-          width: min(292px, calc(100vw - var(--rail-w) - 2.5rem));
-          padding: 1.05rem 1.2rem 0.95rem;
-          background: rgba(255, 254, 252, 0.94);
-          color: #161412;
-          border: 1px solid rgba(198, 188, 172, 0.55);
-          box-shadow: 0 22px 48px rgba(48, 40, 32, 0.1), 0 2px 0 rgba(255, 255, 255, 0.65) inset;
+        .stat-card.dim {
+          opacity: 0.92;
         }
 
-        .card-left {
-          left: calc(var(--rail-w) + clamp(0.65rem, 2.4vw, 1.85rem));
-          top: 21vh;
-          transform: rotate(-1.4deg);
-        }
-
-        .card-right {
-          position: relative;
-          right: auto;
-          bottom: auto;
-          transform: rotate(0.65deg);
-          width: 100%;
-          flex-shrink: 0;
-        }
-
-        .paper-icon {
-          width: 34px;
-          height: 34px;
-          margin-bottom: 0.5rem;
-          border-radius: 50%;
-          border: 1px solid rgba(22, 20, 18, 0.08);
-          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
-        }
-
-        .paper-icon.mindful {
-          background:
-            radial-gradient(circle at 45% 42%, rgba(230, 198, 118, 0.45) 0%, transparent 58%),
-            linear-gradient(165deg, #fdfcfa 0%, #f3ebe3 100%);
-        }
-
-        .paper-icon.steps {
-          background: linear-gradient(
-              180deg,
-              transparent 0%,
-              transparent 38%,
-              rgba(22, 20, 18, 0.07) 38%,
-              rgba(22, 20, 18, 0.07) 62%,
-              transparent 62%
-            ),
-            linear-gradient(165deg, #fdfcfa 0%, #f3ebe3 100%);
-        }
-
-        .paper-title {
+        .stat-num {
           margin: 0;
-          font-size: 0.98rem;
-          letter-spacing: 0.045em;
-          font-weight: 500;
-        }
-
-        .paper-body {
-          margin: 0.6rem 0 0;
-          line-height: 1.58;
-          font-size: 0.8rem;
-          opacity: 0.84;
-          font-weight: 400;
-        }
-
-        .btn-like {
-          margin-top: 0.75rem;
-          padding: 0.32rem 1.1rem;
-          border: none;
-          border-radius: 2px;
-          background: linear-gradient(180deg, #e8c96a 0%, #c9a24a 100%);
-          color: #2a2218;
-          font-size: 0.78rem;
+          font-size: 1.75rem;
+          font-weight: 300;
           letter-spacing: 0.08em;
-          font-family: inherit;
-          cursor: pointer;
-          box-shadow: 0 2px 0 rgba(90, 70, 30, 0.25);
+          color: #a67c52;
         }
 
-        .link-more {
-          margin-top: 0.65rem;
-          display: inline-block;
+        .stat-label {
+          margin: 0.35rem 0 0;
+          font-size: 0.78rem;
+          letter-spacing: 0.1em;
+        }
+
+        .stat-desc {
+          margin: 0.5rem 0 0;
+          font-size: 0.76rem;
+          line-height: 1.55;
+          opacity: 0.82;
+        }
+
+        .band-labels {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.65rem;
+          margin-bottom: 2.25rem;
+        }
+
+        .pill {
+          font-family: ui-sans-serif, system-ui, sans-serif;
+          font-size: 0.68rem;
+          letter-spacing: 0.12em;
+          padding: 0.4rem 0.9rem;
+          border-radius: 999px;
+          background: rgba(255, 255, 255, 0.65);
+          border: 1px solid rgba(198, 188, 172, 0.55);
+          color: #2a2622;
+        }
+
+        .split-cards {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 1.25rem;
+          margin-bottom: 3rem;
+        }
+
+        .mini-card {
+          padding: 1.35rem 1.4rem;
+          background: rgba(255, 254, 252, 0.9);
+          border: 1px solid rgba(198, 188, 172, 0.5);
+          box-shadow: 0 14px 36px rgba(48, 40, 32, 0.08);
+        }
+
+        .mini-card.outline {
+          background: rgba(255, 255, 255, 0.35);
+        }
+
+        .mini-title {
+          margin: 0;
+          font-size: 0.92rem;
+          letter-spacing: 0.08em;
+        }
+
+        .mini-body {
+          margin: 0.65rem 0 0;
           font-size: 0.8rem;
-          color: #b03030;
-          letter-spacing: 0.06em;
+          line-height: 1.65;
+          opacity: 0.85;
+        }
+
+        .mini-link {
+          display: inline-block;
+          margin-top: 0.85rem;
+          font-size: 0.76rem;
+          letter-spacing: 0.08em;
+          color: #8b5a3c;
           text-decoration: underline;
           text-underline-offset: 3px;
         }
 
-        .social-rail {
-          position: absolute;
-          right: clamp(0.35rem, 0.95vw, 0.7rem);
-          top: 50%;
-          transform: translateY(-38%);
-          bottom: auto;
-          z-index: 9;
-          display: flex;
-          flex-direction: column;
-          gap: 0.95rem;
-          font-family: ui-sans-serif, system-ui, sans-serif;
-          font-size: 0.68rem;
-          font-weight: 500;
-          color: rgba(26, 23, 20, 0.48);
+        .closing-line {
+          margin: 0;
+          padding: 1.5rem 0 6rem;
+          font-size: 0.82rem;
+          letter-spacing: 0.06em;
+          line-height: 1.8;
+          opacity: 0.78;
+          text-align: center;
+          border-top: 1px solid rgba(198, 188, 172, 0.45);
         }
 
-        .social-rail span {
-          width: 22px;
-          height: 22px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border: 1px solid rgba(26, 23, 20, 0.14);
-          border-radius: 50%;
-          background: rgba(255, 255, 255, 0.35);
-        }
-
-        @media (max-width: 1100px) {
-          .flower-mask {
-            width: min(66vmin, 440px);
+        @media (max-width: 1000px) {
+          .quote-row {
+            grid-template-columns: 1fr;
           }
 
-          .right-stack {
-            width: min(252px, 30vw);
-            right: clamp(2rem, 4vw, 3rem);
+          .split-cards {
+            grid-template-columns: 1fr;
           }
         }
 
         @media (max-width: 900px) {
-          .hero-content {
-            display: flex;
+          .hero-band {
             flex-direction: column;
-            justify-content: center;
             align-items: center;
-            padding: 5.25rem 1rem 2rem;
-            pointer-events: auto;
           }
 
-          .flower-slot {
-            position: relative;
-            left: auto;
-            top: auto;
-            transform: none;
-          }
-
-          .flower-mask {
-            width: min(76vmin, 400px);
+          .hero-band-spacer {
+            min-height: 40vh;
           }
 
           .right-stack {
-            position: relative;
-            right: auto;
-            top: auto;
-            bottom: auto;
+            flex: 1 1 auto;
             width: 100%;
             max-width: 24rem;
-            margin-top: 1.35rem;
-            gap: 1.5rem;
-            align-items: stretch;
-          }
-
-          .right-stack .card-right {
-            margin-top: 0;
           }
 
           .hero-copy {
@@ -703,11 +846,7 @@ export default function BloomScrollHero() {
           }
 
           .english-stack {
-            max-width: 22rem;
-          }
-
-          .paper-card {
-            display: none;
+            max-width: 100%;
           }
 
           .top-nav {
