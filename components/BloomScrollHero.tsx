@@ -1444,10 +1444,10 @@ export default function BloomScrollHero() {
         /* スマホ用最適化 (768px以下) */
         @media (max-width: 768px) {
           .flower-slot {
-            width: 85vw;
-            height: 85vw;
-            max-width: 400px;
-            max-height: 400px;
+            width: 90vw;
+            height: 90vw;
+            max-width: 350px;
+            max-height: 350px;
           }
 
           .sticky-visuals .card-left,
@@ -1457,9 +1457,9 @@ export default function BloomScrollHero() {
 
           .sticky-visuals .hero-copy {
             right: 50%;
-            top: 8vh;
+            top: 6vh;
             transform: translateX(50%);
-            max-width: 90vw;
+            max-width: 85vw;
             flex-direction: column;
             align-items: center;
             text-align: center;
@@ -1467,18 +1467,21 @@ export default function BloomScrollHero() {
 
           .vertical-lead {
             writing-mode: horizontal-tb;
-            letter-spacing: 0.1em;
-            font-size: clamp(0.9rem, 3.5vw, 1.2rem);
-            line-height: 1.6;
+            letter-spacing: 0.08em;
+            font-size: clamp(1rem, 4vw, 1.3rem);
+            line-height: 1.5;
+            margin-bottom: 0.8rem;
           }
 
           .english-stack {
             max-width: 100%;
             text-align: center;
+            margin-bottom: 1rem;
           }
 
           .english-line {
-            font-size: clamp(0.6rem, 2.8vw, 0.9rem);
+            font-size: clamp(0.65rem, 3vw, 0.85rem);
+            line-height: 1.4;
           }
 
           .top-nav {
@@ -1490,41 +1493,62 @@ export default function BloomScrollHero() {
           }
 
           .brand-title {
-            font-size: clamp(1.2rem, 4vw, 1.6rem);
+            font-size: clamp(1.1rem, 4.5vw, 1.5rem);
           }
 
           .brand-sub {
-            font-size: clamp(0.6rem, 2.5vw, 0.8rem);
+            font-size: clamp(0.55rem, 2.8vw, 0.75rem);
           }
 
           .paper-card {
             max-width: 100%;
-            margin: 1rem 0;
-            padding: 1.2rem;
+            margin: 1.5rem 0;
+            padding: 1.5rem;
+            border-radius: 8px;
           }
 
           .paper-title {
-            font-size: clamp(0.9rem, 3.5vw, 1.1rem);
+            font-size: clamp(1rem, 4vw, 1.2rem);
+            margin-bottom: 0.8rem;
           }
 
           .paper-body {
-            font-size: clamp(0.75rem, 3vw, 0.9rem);
-            line-height: 1.7;
+            font-size: clamp(0.8rem, 3.5vw, 0.95rem);
+            line-height: 1.6;
+            margin-bottom: 1rem;
           }
 
           .scroll-inner {
-            padding: 1rem;
+            padding: 1.5rem 1rem;
           }
 
           .band-labels {
             flex-wrap: wrap;
             justify-content: center;
-            gap: 0.5rem;
+            gap: 0.6rem;
+            margin-bottom: 1rem;
           }
 
           .pill {
-            font-size: 0.65rem;
-            padding: 0.3rem 0.7rem;
+            font-size: 0.7rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: 12px;
+          }
+
+          .btn-like {
+            width: 100%;
+            padding: 0.8rem 1.5rem;
+            font-size: clamp(0.85rem, 4vw, 1rem);
+            border-radius: 6px;
+            margin-top: 1rem;
+          }
+
+          .link-more {
+            font-size: clamp(0.85rem, 4vw, 1rem);
+            padding: 0.8rem 0;
+            display: block;
+            text-align: center;
+            margin-top: 1rem;
           }
 
           .site-footer-inner {
