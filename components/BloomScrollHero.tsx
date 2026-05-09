@@ -358,11 +358,13 @@ export default function BloomScrollHero() {
             </button>
           </aside>
 
-          <p className="closing-line">
-            Beauty &amp; Social Integration — 内なる輝きを、社会とともにひらいていく。
-          </p>
+          </div>
+      </div>
 
-        </div>
+      <div className="closing-section">
+        <p className="closing-line">
+          Beauty &amp; Social Integration — 内なる輝きを、社会とともにひらいていく。
+        </p>
       </div>
 
       <footer className="site-footer">
@@ -1205,15 +1207,26 @@ export default function BloomScrollHero() {
           text-underline-offset: 3px;
         }
 
+        .closing-section {
+          position: relative;
+          z-index: 15;
+          padding: 4rem 0 2rem;
+          margin-left: var(--rail-w);
+          margin-right: auto;
+          max-width: 1280px;
+        }
+
         .closing-line {
           margin: 0;
-          padding: 1.5rem 0 2rem;
+          padding: 1.5rem 0;
           font-size: 0.82rem;
           letter-spacing: 0.06em;
           line-height: 1.8;
           opacity: 0.78;
           text-align: center;
           border-top: 1px solid rgba(198, 188, 172, 0.45);
+          background: rgba(250, 247, 239, 0.8);
+          backdrop-filter: blur(8px);
         }
 
         .site-footer {
