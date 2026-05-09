@@ -159,17 +159,6 @@ export default function BloomScrollHero() {
           <span>◎</span>
         </div>
 
-        <aside className="paper-card card-left">
-          <div className="paper-icon mindful" aria-hidden="true" />
-          <p className="paper-title">MINDFUL BEAUTY</p>
-          <p className="paper-body">
-            Calm, intentional care that lets your presence settle and brighten-without rushing the bloom.
-          </p>
-          <button type="button" className="btn-like">
-            Like
-          </button>
-        </aside>
-
         <div className="hero-copy">
           <p className="vertical-lead">内なる輝きが、今ひらく。</p>
           <div className="english-stack">
@@ -178,17 +167,6 @@ export default function BloomScrollHero() {
             <p className="english-line small">SOCIAL REINTEGRATION THROUGH SUPPORT.</p>
           </div>
         </div>
-
-        <aside className="paper-card card-right">
-          <div className="paper-icon steps" aria-hidden="true" />
-          <p className="paper-title">SOCIAL STEPPING STONES</p>
-          <p className="paper-body">
-            Gentle steps back into connection-paced for you, supported at every landing.
-          </p>
-          <a href="#" className="link-more">
-            Link more
-          </a>
-        </aside>
       </div>
 
       {/* スクロールで流れる通常コンテンツ */}
@@ -204,6 +182,72 @@ export default function BloomScrollHero() {
         <MomijiLayer />
 
         <div className="scroll-inner">
+          <aside className="paper-card">
+            <div className="paper-icon mindful" aria-hidden="true" />
+            <p className="paper-title">MINDFUL BEAUTY</p>
+            <p className="paper-body">
+              Calm, intentional care that lets your presence settle and brighten-without rushing the bloom.
+            </p>
+            <button type="button" className="btn-like">
+              Like
+            </button>
+          </aside>
+
+          <aside className="paper-card">
+            <div className="paper-icon steps" aria-hidden="true" />
+            <p className="paper-title">SOCIAL STEPPING STONES</p>
+            <p className="paper-body">
+              Gentle steps back into connection-paced for you, supported at every landing.
+            </p>
+            <a href="#" className="link-more">
+              Link more
+            </a>
+          </aside>
+
+          <aside className="paper-card">
+            <div className="paper-icon mindful" aria-hidden="true" />
+            <p className="paper-title">ABOUT</p>
+            <p className="paper-body">
+              Re-Paletteは美しさを通じて社会再統合を支援するプラットフォームです。一人ひとりのペースを尊重し、内なる輝きを引き出すサポートを提供します。
+            </p>
+            <button type="button" className="btn-like">
+              詳しく見る
+            </button>
+          </aside>
+
+          <aside className="paper-card">
+            <div className="paper-icon steps" aria-hidden="true" />
+            <p className="paper-title">SUPPORT</p>
+            <p className="paper-body">
+              専門スタッフによる個別サポート、グループセッション、ピアサポートなど、多様な支援プログラムをご用意しています。
+            </p>
+            <a href="#" className="link-more">
+              サポート詳細
+            </a>
+          </aside>
+
+          <aside className="paper-card">
+            <div className="paper-icon mindful" aria-hidden="true" />
+            <p className="paper-title">PROGRAMS</p>
+            <p className="paper-body">
+              マインドフルネス・ビューティー、アートセラピー、コミュニティ活動など、段階的に参加できるプログラムを展開しています。
+            </p>
+            <button type="button" className="btn-like">
+              プログラム一覧
+            </button>
+          </aside>
+
+          <aside className="paper-card">
+            <div className="paper-icon steps" aria-hidden="true" />
+            <p className="paper-title">CONTACT</p>
+            <p className="paper-body">
+              ご相談・見学・お問い合わせはお気軽にご連絡ください。専門スタッフが丁寧に対応いたします。
+            </p>
+            <a href="#" className="link-more">
+              お問い合わせ
+            </a>
+          </aside>
+
           <div className="quote-row">
             <blockquote className="quote-card">
               <p className="quote-text">「美しさは、戻るための地図になる。」</p>
@@ -565,9 +609,10 @@ export default function BloomScrollHero() {
           max-width: 1280px;
         }
 
-        .paper-card {
+        .scroll-inner .paper-card {
           width: min(292px, 88vw);
           padding: 1.05rem 1.2rem 0.95rem;
+          margin-bottom: 2rem;
           background: rgba(255, 254, 252, 0.94);
           color: #161412;
           border: 1px solid rgba(198, 188, 172, 0.55);
