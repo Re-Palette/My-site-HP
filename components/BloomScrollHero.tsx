@@ -157,7 +157,7 @@ export default function BloomScrollHero() {
         };
 
         // requestAnimationFrameベースの更新ループ
-        let rafId: number;
+        let rafId: number | null = null;
         const updateLoop = () => {
           syncVideoToScroll();
           rafId = requestAnimationFrame(updateLoop);
@@ -177,7 +177,10 @@ export default function BloomScrollHero() {
         setupCanvas();
         gsap.ticker.add(updateLoop);
         removeVideoTicker = () => {
-          cancelAnimationFrame(rafId);
+          if (rafId) {
+            cancelAnimationFrame(rafId);
+            rafId = null;
+          }
           gsap.ticker.remove(updateLoop);
         };
 
