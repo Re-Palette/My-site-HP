@@ -22,7 +22,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: npm
+          # package-lock.json が無いと cache: npm でここで失敗することがあるためキャッシュは使わない
 
       # package-lock.json が無い場合でも動くように install を使用（ある場合は ci の方が安定）
       - run: npm install
