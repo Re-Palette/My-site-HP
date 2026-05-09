@@ -60,9 +60,12 @@ export default function BloomScrollHero() {
         };
 
         let smoothTime = 0;
+        const activeRange = 0.84;
 
         const syncVideoToScroll = () => {
-          const target = scrollProgressForSection() * duration;
+          const progress = scrollProgressForSection();
+          const mapped = gsap.utils.clamp(0, 1, progress / activeRange);
+          const target = mapped * duration;
           const blend = 1 - Math.pow(0.72, gsap.ticker.deltaRatio());
           smoothTime += (target - smoothTime) * Math.min(1, blend * 1.35);
           const seek = gsap.utils.clamp(0, duration, smoothTime);
@@ -155,6 +158,37 @@ export default function BloomScrollHero() {
           <span>𝕏</span>
           <span>◎</span>
         </div>
+
+        <aside className="paper-card card-left">
+          <div className="paper-icon mindful" aria-hidden="true" />
+          <p className="paper-title">MINDFUL BEAUTY</p>
+          <p className="paper-body">
+            Calm, intentional care that lets your presence settle and brighten-without rushing the bloom.
+          </p>
+          <button type="button" className="btn-like">
+            Like
+          </button>
+        </aside>
+
+        <div className="hero-copy">
+          <p className="vertical-lead">内なる輝きが、今ひらく。</p>
+          <div className="english-stack">
+            <p className="english-line">EMPOWERMENT THROUGH BEAUTY</p>
+            <p className="english-line muted">Your Inner Radiance,</p>
+            <p className="english-line small">SOCIAL REINTEGRATION THROUGH SUPPORT.</p>
+          </div>
+        </div>
+
+        <aside className="paper-card card-right">
+          <div className="paper-icon steps" aria-hidden="true" />
+          <p className="paper-title">SOCIAL STEPPING STONES</p>
+          <p className="paper-body">
+            Gentle steps back into connection-paced for you, supported at every landing.
+          </p>
+          <a href="#" className="link-more">
+            Link more
+          </a>
+        </aside>
       </div>
 
       {/* スクロールで流れる通常コンテンツ */}
@@ -170,40 +204,6 @@ export default function BloomScrollHero() {
         <MomijiLayer />
 
         <div className="scroll-inner">
-          <div className="hero-band">
-            <aside className="paper-card card-left">
-              <div className="paper-icon mindful" aria-hidden="true" />
-              <p className="paper-title">MINDFUL BEAUTY</p>
-              <p className="paper-body">
-                Calm, intentional care that lets your presence settle and brighten-without rushing the bloom.
-              </p>
-              <button type="button" className="btn-like">
-                Like
-              </button>
-            </aside>
-            <div className="hero-band-spacer" aria-hidden="true" />
-            <div className="right-stack">
-              <div className="hero-copy">
-                <p className="vertical-lead">内なる輝きが、今ひらく。</p>
-                <div className="english-stack">
-                  <p className="english-line">EMPOWERMENT THROUGH BEAUTY</p>
-                  <p className="english-line muted">Your Inner Radiance,</p>
-                  <p className="english-line small">SOCIAL REINTEGRATION THROUGH SUPPORT.</p>
-                </div>
-              </div>
-              <aside className="paper-card card-right">
-                <div className="paper-icon steps" aria-hidden="true" />
-                <p className="paper-title">SOCIAL STEPPING STONES</p>
-                <p className="paper-body">
-                  Gentle steps back into connection—paced for you, supported at every landing.
-                </p>
-                <a href="#" className="link-more">
-                  Link more
-                </a>
-              </aside>
-            </div>
-          </div>
-
           <div className="quote-row">
             <blockquote className="quote-card">
               <p className="quote-text">「美しさは、戻るための地図になる。」</p>
@@ -268,7 +268,7 @@ export default function BloomScrollHero() {
       <style jsx>{`
         .bloom-scroll-section {
           position: relative;
-          min-height: 500vh;
+          min-height: 430vh;
           overflow: clip;
           font-family: "Yu Mincho", "Hiragino Mincho ProN", "Noto Serif JP", "Times New Roman", serif;
           color: #1c1916;
@@ -280,7 +280,7 @@ export default function BloomScrollHero() {
           top: 0;
           height: 100vh;
           width: 100%;
-          z-index: 30;
+          z-index: 40;
           pointer-events: none;
           isolation: isolate;
         }
@@ -296,7 +296,7 @@ export default function BloomScrollHero() {
           left: 50%;
           top: 50%;
           transform: translate(-50%, -50%);
-          z-index: 2;
+          z-index: 3;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -449,11 +449,43 @@ export default function BloomScrollHero() {
           backdrop-filter: blur(4px);
         }
 
+        .sticky-visuals .paper-card {
+          position: absolute;
+          z-index: 9;
+          width: min(292px, 28vw);
+          min-width: 240px;
+        }
+
+        .sticky-visuals .card-left {
+          left: calc(var(--rail-w) + clamp(0.5rem, 2vw, 2rem));
+          top: 25vh;
+          transform: rotate(-1.3deg);
+        }
+
+        .sticky-visuals .card-right {
+          right: clamp(2.25rem, 4vw, 4rem);
+          top: 57vh;
+          transform: rotate(1deg);
+        }
+
+        .sticky-visuals .hero-copy {
+          position: absolute;
+          right: clamp(3.8rem, 6vw, 7rem);
+          top: 23vh;
+          z-index: 8;
+          display: flex;
+          flex-direction: row;
+          align-items: flex-start;
+          gap: clamp(0.7rem, 1.8vw, 1.2rem);
+          max-width: 310px;
+          pointer-events: none;
+        }
+
         /* スクロール文書層 */
         .scroll-doc {
           position: relative;
           margin-top: -100vh;
-          min-height: 500vh;
+          min-height: 430vh;
           z-index: 10;
           --rail-w: clamp(42px, 4.2vw, 58px);
         }
@@ -529,7 +561,7 @@ export default function BloomScrollHero() {
           z-index: 6;
           margin-left: var(--rail-w);
           margin-right: auto;
-          padding: clamp(5.5rem, 14vh, 8.5rem) clamp(1rem, 4vw, 3rem) 4rem;
+          padding: calc(100vh + 1.5rem) clamp(1rem, 4vw, 3rem) 4rem;
           max-width: 1280px;
         }
 
@@ -612,38 +644,6 @@ export default function BloomScrollHero() {
           letter-spacing: 0.06em;
           text-decoration: underline;
           text-underline-offset: 3px;
-        }
-
-        .hero-band {
-          display: grid;
-          grid-template-columns: minmax(230px, 292px) minmax(320px, 1fr) minmax(230px, 292px);
-          align-items: start;
-          gap: clamp(1.25rem, 2.4vw, 2.4rem);
-          margin-bottom: 3rem;
-          min-height: 52vh;
-        }
-
-        .hero-band-spacer {
-          min-height: min(60vh, 560px);
-        }
-
-        .right-stack {
-          display: flex;
-          flex-direction: column;
-          gap: clamp(1.25rem, 3vh, 2rem);
-          align-items: stretch;
-          justify-self: end;
-        }
-
-        .card-right {
-          transform: rotate(0.65deg);
-        }
-
-        .hero-copy {
-          display: flex;
-          flex-direction: row;
-          align-items: flex-start;
-          gap: clamp(0.7rem, 1.8vw, 1.2rem);
         }
 
         .vertical-lead {
@@ -823,8 +823,11 @@ export default function BloomScrollHero() {
         }
 
         .site-footer {
-          position: relative;
-          z-index: 60;
+          position: fixed;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          z-index: 55;
           margin-top: 0;
           padding: 0;
           background: linear-gradient(180deg, #2a2622 0%, #181614 100%);
@@ -884,21 +887,16 @@ export default function BloomScrollHero() {
         }
 
         @media (max-width: 900px) {
-          .hero-band {
-            grid-template-columns: 1fr;
-            justify-items: center;
+          .sticky-visuals .card-left,
+          .sticky-visuals .card-right {
+            display: none;
           }
 
-          .hero-band-spacer {
-            min-height: 26vh;
-          }
-
-          .right-stack {
-            width: 100%;
-            max-width: 24rem;
-          }
-
-          .hero-copy {
+          .sticky-visuals .hero-copy {
+            right: 50%;
+            top: 16vh;
+            transform: translateX(50%);
+            max-width: 86vw;
             flex-direction: column;
             align-items: center;
             text-align: center;
