@@ -296,22 +296,38 @@ export default function BloomScrollHero() {
             </a>
           </aside>
 
-          <div className="quote-row">
-            <blockquote className="quote-card">
-              <p className="quote-text">「美しさは、戻るための地図になる。」</p>
-              <cite className="quote-from">Re-Palette Philosophy</cite>
-            </blockquote>
-            <div className="stat-card">
-              <p className="stat-num">01</p>
-              <p className="stat-label">Mindful Session</p>
-              <p className="stat-desc">呼吸とペースを整え、自分のリズムを取り戻す時間。</p>
-            </div>
-            <div className="stat-card dim">
-              <p className="stat-num">02</p>
-              <p className="stat-label">Community Bridge</p>
-              <p className="stat-desc">小さな対話から、社会とのつながりをそっと広げます。</p>
-            </div>
-          </div>
+          <aside className="paper-card">
+            <div className="paper-icon mindful" aria-hidden="true" />
+            <p className="paper-title">PHILOSOPHY</p>
+            <p className="paper-body">
+              「美しさは、戻るための地図になる。」
+            </p>
+            <button type="button" className="btn-like">
+              Re-Palette Philosophy
+            </button>
+          </aside>
+
+          <aside className="paper-card">
+            <div className="paper-icon steps" aria-hidden="true" />
+            <p className="paper-title">MINDFUL SESSION</p>
+            <p className="paper-body">
+              呼吸とペースを整え、自分のリズムを取り戻す時間。
+            </p>
+            <a href="#" className="link-more">
+              詳しく見る
+            </a>
+          </aside>
+
+          <aside className="paper-card">
+            <div className="paper-icon mindful" aria-hidden="true" />
+            <p className="paper-title">COMMUNITY BRIDGE</p>
+            <p className="paper-body">
+              小さな対話から、社会とのつながりをそっと広げます。
+            </p>
+            <button type="button" className="btn-like">
+              参加する
+            </button>
+          </aside>
 
           <div className="band-labels">
             <span className="pill">Presence</span>
@@ -320,22 +336,27 @@ export default function BloomScrollHero() {
             <span className="pill">Support</span>
           </div>
 
-          <div className="split-cards">
-            <div className="mini-card">
-              <h3 className="mini-title">Program</h3>
-              <p className="mini-body">少人数・安心の環境で、段階的に参加の幅を広げるプログラムをご用意しています。</p>
-              <a className="mini-link" href="#">
-                詳しく見る
-              </a>
-            </div>
-            <div className="mini-card outline">
-              <h3 className="mini-title">Contact</h3>
-              <p className="mini-body">ご相談・見学のご希望は、お気軽にお問い合わせください。専門スタッフが丁寧にお答えします。</p>
-              <a className="mini-link" href="#">
-                お問い合わせ
-              </a>
-            </div>
-          </div>
+          <aside className="paper-card">
+            <div className="paper-icon steps" aria-hidden="true" />
+            <p className="paper-title">PROGRAM</p>
+            <p className="paper-body">
+              少人数・安心の環境で、段階的に参加の幅を広げるプログラムをご用意しています。
+            </p>
+            <a href="#" className="link-more">
+              詳しく見る
+            </a>
+          </aside>
+
+          <aside className="paper-card">
+            <div className="paper-icon mindful" aria-hidden="true" />
+            <p className="paper-title">CONTACT</p>
+            <p className="paper-body">
+              ご相談・見学のご希望は、お気軽にお問い合わせください。専門スタッフが丁寧にお答えします。
+            </p>
+            <button type="button" className="btn-like">
+              お問い合わせ
+            </button>
+          </aside>
 
           <p className="closing-line">
             Beauty &amp; Social Integration — 内なる輝きを、社会とともにひらいていく。
