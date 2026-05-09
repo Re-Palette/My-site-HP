@@ -1061,8 +1061,8 @@ export default function BloomScrollHero() {
         }
 
         .quote-row {
-          display: grid;
-          grid-template-columns: 1.4fr 1fr 1fr;
+          display: flex;
+          flex-direction: column;
           gap: 1.25rem;
           margin-bottom: 2.5rem;
           align-items: stretch;
@@ -1144,8 +1144,8 @@ export default function BloomScrollHero() {
         }
 
         .split-cards {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
+          display: flex;
+          flex-direction: column;
           gap: 1.25rem;
           margin-bottom: 3rem;
         }
