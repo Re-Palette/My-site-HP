@@ -98,7 +98,7 @@ export default function BloomScrollHero() {
 
         // Canvas描画用の変数
         const canvasEl = canvasRef.current;
-        const ctx = canvasEl?.getContext('2d');
+        const ctx = canvasEl?.getContext('2d') as CanvasRenderingContext2D | null;
         let isVideoReady = false;
 
         // 動画の準備が完了したらCanvas描画を開始
@@ -112,7 +112,7 @@ export default function BloomScrollHero() {
 
         // Canvasに動画を描画する関数
         const drawVideoToCanvas = () => {
-          if (!isVideoReady || !ctx || !videoEl) return;
+          if (!isVideoReady || !ctx || !videoEl || !canvasEl) return;
           
           try {
             ctx.drawImage(videoEl, 0, 0, canvasEl.width, canvasEl.height);
