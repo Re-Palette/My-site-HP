@@ -14,11 +14,15 @@ const FRAME_IMAGES = Array.from({ length: 240 }, (_, i) =>
   `frames/frame_${String(i + 1).padStart(3, '0')}.jpg`
 );
 
+// 一時的に動画ファイルに戻す（連番画像準備完了まで）
+const TEMP_USE_VIDEO = true;
+
 export default function BloomScrollHero() {
   const [isLoading, setIsLoading] = useState(true);
   const [deviceType, setDeviceType] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
   const [imagesLoaded, setImagesLoaded] = useState(false);
   const sectionRef = useRef<HTMLElement | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const loadingRef = useRef<HTMLDivElement | null>(null);
   const imagesRef = useRef<HTMLImageElement[]>([]);
@@ -49,47 +53,66 @@ export default function BloomScrollHero() {
     // リサイズ時の検出
     const handleResize = () => {
       detectDevice();
-      updateCanvasSize();
+      if (!TEMP_USE_VIDEO) {
+        updateCanvasSize();
+      }
     };
     window.addEventListener('resize', handleResize);
 
-    // Canvasサイズの更新
-    const updateCanvasSize = () => {
-      if (!canvasEl) return;
-      
-      const dpr = window.devicePixelRatio || 1;
-      const rect = canvasEl.getBoundingClientRect();
-      
-      canvasEl.width = rect.width * dpr;
-      canvasEl.height = rect.height * dpr;
-      
-      const ctx = canvasEl.getContext('2d');
-      if (ctx) {
-        ctx.scale(dpr, dpr);
-      }
-    };
+    if (TEMP_USE_VIDEO) {
+      // 一時的に動画モード
+      const videoEl = videoRef.current;
+      if (!videoEl) return;
 
-    // 連番画像のプリロード
-    const preloadImages = async () => {
-      const images: HTMLImageElement[] = [];
-      const loadPromises = FRAME_IMAGES.map((src, index) => {
-        return new Promise<HTMLImageElement>((resolve, reject) => {
-          const img = new Image();
-          img.src = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/${src}`;
-          img.onload = () => {
-            images[index] = img;
-            resolve(img);
-          };
-          img.onerror = reject;
+      let videoSyncReady = false;
+      const setScrollSync = () => {
+        const duration = videoEl.duration;
+        if (!duration || Number.isNaN(duration) || videoSyncReady) return;
+        videoSyncReady = true;
+
+        videoEl.pause();
+        videoEl.playbackRate = 1.0;
+
+        const setupCanvas = () => {
+          if (!canvasEl) return;
+          const ctx = canvasEl.getContext('2d');
+          if (ctx && videoEl.videoWidth && videoEl.videoHeight) {
+            canvasEl.width = videoEl.videoWidth;
+            canvasEl.height = videoEl.videoHeight;
+          }
+        };
+
+        const drawVideoToCanvas = () => {
+          const ctx = canvasEl.getContext('2d');
+          if (!ctx || !videoEl || !canvasEl) return;
+          
+          try {
+            const rect = canvasEl.getBoundingClientRect();
+            ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
+            ctx.drawImage(videoEl, 0, 0, rect.width, rect.height);
+          } catch (e) {
+            console.log('Canvas draw error:', e);
+          }
+        };
+
+        const scrollTrigger = ScrollTrigger.create({
+          trigger: sectionEl,
+          start: "top top",
+          end: "bottom top",
+          scrub: 0.8,
+          onUpdate: (self) => {
+            const progress = self.progress;
+            const targetTime = progress * duration;
+            videoEl.currentTime = targetTime;
+            drawVideoToCanvas();
+          },
+          onRefresh: () => {
+            setupCanvas();
+          }
         });
-      });
 
-      try {
-        await Promise.all(loadPromises);
-        imagesRef.current = images;
-        setImagesLoaded(true);
+        setupCanvas();
         
-        // ロード画面を非表示
         if (loadingEl) {
           gsap.to(loadingEl, {
             opacity: 0,
@@ -100,71 +123,121 @@ export default function BloomScrollHero() {
             }
           });
         }
-      } catch (error) {
-        console.error('画像のプリロードに失敗しました:', error);
+
+        return () => {
+          scrollTrigger.kill();
+        };
+      };
+
+      if (videoEl.readyState >= 1) {
+        setScrollSync();
+      } else {
+        const onLoadedMetadata = () => setScrollSync();
+        videoEl.addEventListener("loadedmetadata", onLoadedMetadata, { once: true });
       }
-    };
 
-    // 線形補間（Lerp）関数
-    const lerp = (start: number, end: number, factor: number): number => {
-      return start + (end - start) * factor;
-    };
-
-    // Canvas描画関数
-    const drawFrame = () => {
-      const ctx = canvasEl?.getContext('2d');
-      if (!ctx || imagesRef.current.length === 0) return;
-
-      // 現在のフレームと目標フレームの間を線形補間
-      const lerpFactor = 0.15; // イージングの強さ（0.1-0.2がおすすめ）
-      currentFrameRef.current = lerp(currentFrameRef.current, targetFrameRef.current, lerpFactor);
-
-      // 描画するフレーム番号を計算
-      const frameIndex = Math.floor(currentFrameRef.current);
-      const clampedIndex = Math.max(0, Math.min(frameIndex, imagesRef.current.length - 1));
-      
-      const image = imagesRef.current[clampedIndex];
-      if (image && image.complete) {
-        // Canvasをクリア
-        ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
+      return () => {
+        window.removeEventListener('resize', handleResize);
+      };
+    } else {
+      // 連番画像モード（本来の実装）
+      const updateCanvasSize = () => {
+        if (!canvasEl) return;
         
-        // 画像を描画（画面全体に広がるように）
+        const dpr = window.devicePixelRatio || 1;
         const rect = canvasEl.getBoundingClientRect();
-        ctx.drawImage(image, 0, 0, rect.width, rect.height);
-      }
+        
+        canvasEl.width = rect.width * dpr;
+        canvasEl.height = rect.height * dpr;
+        
+        const ctx = canvasEl.getContext('2d');
+        if (ctx) {
+          ctx.scale(dpr, dpr);
+        }
+      };
 
-      // 次のフレームを要求
-      animationFrameRef.current = requestAnimationFrame(drawFrame);
-    };
+      const preloadImages = async () => {
+        const images: HTMLImageElement[] = [];
+        const loadPromises = FRAME_IMAGES.map((src, index) => {
+          return new Promise<HTMLImageElement>((resolve, reject) => {
+            const img = new Image();
+            img.src = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/${src}`;
+            img.onload = () => {
+              images[index] = img;
+              resolve(img);
+            };
+            img.onerror = reject;
+          });
+        });
 
-    // ScrollTriggerによるスクロール同期
-    const scrollTrigger = ScrollTrigger.create({
-      trigger: sectionEl,
-      start: "top top",
-      end: "bottom top",
-      scrub: 0.8,
-      onUpdate: (self) => {
-        // スクロール進行度をフレーム番号に変換
-        const targetFrame = self.progress * (FRAME_IMAGES.length - 1);
-        targetFrameRef.current = targetFrame;
-      }
-    });
+        try {
+          await Promise.all(loadPromises);
+          imagesRef.current = images;
+          setImagesLoaded(true);
+          
+          if (loadingEl) {
+            gsap.to(loadingEl, {
+              opacity: 0,
+              duration: 1.2,
+              ease: "power2.inOut",
+              onComplete: () => {
+                setIsLoading(false);
+              }
+            });
+          }
+        } catch (error) {
+          console.error('画像のプリロードに失敗しました:', error);
+        }
+      };
 
-    // 初期化
-    updateCanvasSize();
-    preloadImages().then(() => {
-      // 画像読み込み完了後に描画開始
-      drawFrame();
-    });
+      const lerp = (start: number, end: number, factor: number): number => {
+        return start + (end - start) * factor;
+      };
 
-    // クリーンアップ
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      scrollTrigger.kill();
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-      }
-    };
+      const drawFrame = () => {
+        const ctx = canvasEl?.getContext('2d');
+        if (!ctx || imagesRef.current.length === 0) return;
+
+        const lerpFactor = 0.15;
+        currentFrameRef.current = lerp(currentFrameRef.current, targetFrameRef.current, lerpFactor);
+
+        const frameIndex = Math.floor(currentFrameRef.current);
+        const clampedIndex = Math.max(0, Math.min(frameIndex, imagesRef.current.length - 1));
+        
+        const image = imagesRef.current[clampedIndex];
+        if (image && image.complete) {
+          ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
+          const rect = canvasEl.getBoundingClientRect();
+          ctx.drawImage(image, 0, 0, rect.width, rect.height);
+        }
+
+        animationFrameRef.current = requestAnimationFrame(drawFrame);
+      };
+
+      const scrollTrigger = ScrollTrigger.create({
+        trigger: sectionEl,
+        start: "top top",
+        end: "bottom top",
+        scrub: 0.8,
+        onUpdate: (self) => {
+          const targetFrame = self.progress * (FRAME_IMAGES.length - 1);
+          targetFrameRef.current = targetFrame;
+        }
+      });
+
+      updateCanvasSize();
+      preloadImages().then(() => {
+        drawFrame();
+      });
+
+      return () => {
+        window.removeEventListener('resize', handleResize);
+        scrollTrigger.kill();
+        if (animationFrameRef.current) {
+          cancelAnimationFrame(animationFrameRef.current);
+        }
+      };
+    }
   }, []);
 
   return (
@@ -200,11 +273,29 @@ export default function BloomScrollHero() {
       <div className="sticky-visuals">
         <div className="flower-slot" aria-hidden="true">
           <div className="flower-mask">
-            <canvas
-              ref={canvasRef}
-              className="bloom-canvas"
-              style={{ width: '100%', height: '100%' }}
-            />
+            {TEMP_USE_VIDEO ? (
+              <>
+                <video
+                  ref={videoRef}
+                  className="bloom-video"
+                  src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/Fireflower_cropped.mp4`}
+                  muted
+                  playsInline
+                  preload="auto"
+                  style={{ display: 'none' }}
+                />
+                <canvas
+                  ref={canvasRef}
+                  className="bloom-canvas"
+                />
+              </>
+            ) : (
+              <canvas
+                ref={canvasRef}
+                className="bloom-canvas"
+                style={{ width: '100%', height: '100%' }}
+              />
+            )}
           </div>
           <div className="flower-soft-edge" aria-hidden="true" />
         </div>
