@@ -74,7 +74,7 @@ export default function BloomScrollHero() {
         videoEl.playbackRate = 1.0;
 
         const setupCanvas = () => {
-          if (!canvasEl) return;
+          if (!canvasEl || !videoEl) return;
           const ctx = canvasEl.getContext('2d');
           if (ctx && videoEl.videoWidth && videoEl.videoHeight) {
             canvasEl.width = videoEl.videoWidth;
@@ -83,7 +83,7 @@ export default function BloomScrollHero() {
         };
 
         const drawVideoToCanvas = () => {
-          const ctx = canvasEl.getContext('2d');
+          const ctx = canvasEl?.getContext('2d');
           if (!ctx || !videoEl || !canvasEl) return;
           
           try {
@@ -196,7 +196,7 @@ export default function BloomScrollHero() {
 
       const drawFrame = () => {
         const ctx = canvasEl?.getContext('2d');
-        if (!ctx || imagesRef.current.length === 0) return;
+        if (!ctx || imagesRef.current.length === 0 || !canvasEl) return;
 
         const lerpFactor = 0.15;
         currentFrameRef.current = lerp(currentFrameRef.current, targetFrameRef.current, lerpFactor);
