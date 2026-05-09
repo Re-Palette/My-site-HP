@@ -100,45 +100,32 @@ export default function BloomScrollHero() {
         };
 
         // GSAP ScrollTriggerによる動画同期
-        const videoTimeline = gsap.timeline({
-          scrollTrigger: {
-            trigger: sectionEl,
-            start: "top top",
-            end: "bottom top",
-            scrub: 0.8, // 慣性を持たせた滑らかなスクラビング
-            ease: "none", // カクつき防止のための線形補間
-            onUpdate: (self) => {
-              const progress = self.progress;
-              const targetTime = progress * duration;
-              
-              // スムージングなしの直接更新（GSAPが処理）
-              videoEl.currentTime = targetTime;
-              
-              // Canvas描画
-              drawVideoToCanvas();
-            },
-            onRefresh: () => {
-              // ScrollTriggerの更新時にCanvasを再設定
-              setupCanvas();
-            },
-            // パフォーマンス最適化のための設定
-            invalidateOnRefresh: true,
-            anticipatePin: 1,
-            pinType: "fixed"
+        setupCanvas();
+        
+        const videoScrollTrigger = ScrollTrigger.create({
+          trigger: sectionEl,
+          start: "top top",
+          end: "bottom top",
+          scrub: 0.8, // 慣性を持たせた滑らかなスクラビング
+          onUpdate: (self) => {
+            const progress = self.progress;
+            const targetTime = progress * duration;
+            
+            // スムージングなしの直接更新（GSAPが処理）
+            videoEl.currentTime = targetTime;
+            
+            // Canvas描画
+            drawVideoToCanvas();
+          },
+          onRefresh: () => {
+            // ScrollTriggerの更新時にCanvasを再設定
+            setupCanvas();
           }
         });
 
-        // 動画の初期化
-        setupCanvas();
-        
         // ScrollTriggerのクリーンアップ
         removeVideoTicker = () => {
-          videoTimeline.kill();
-          ScrollTrigger.getAll().forEach(trigger => {
-            if (trigger.trigger === sectionEl) {
-              trigger.kill();
-            }
-          });
+          videoScrollTrigger.kill();
         };
 
         // リサイズ対応
@@ -149,21 +136,6 @@ export default function BloomScrollHero() {
         removeResizeListener = () => {
           window.removeEventListener("resize", onResize);
         };
-
-        // 初期状態を設定
-        const initialProgress = ScrollTrigger.create({
-          trigger: sectionEl,
-          start: "top top",
-          end: "bottom top",
-          onUpdate: (self) => {
-            videoTimeline.progress(self.progress);
-          }
-        });
-        
-        // 初期化後に一度だけ実行
-        setTimeout(() => {
-          initialProgress.kill();
-        }, 100);
       };
 
       if (videoEl.readyState >= 1) {
