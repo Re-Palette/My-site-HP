@@ -9,21 +9,28 @@ import MomijiLayer from "./MomijiLayer";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const VIDEO_FILE = "Firefly ゆっくりと花が開花する動画 316695.mp4";
+// 連番画像のパス配列（実際の画像名に合わせてください）
+const FRAME_IMAGES = Array.from({ length: 240 }, (_, i) => 
+  `frames/frame_${String(i + 1).padStart(3, '0')}.jpg`
+);
 
 export default function BloomScrollHero() {
   const [isLoading, setIsLoading] = useState(true);
   const [deviceType, setDeviceType] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
+  const [imagesLoaded, setImagesLoaded] = useState(false);
   const sectionRef = useRef<HTMLElement | null>(null);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const loadingRef = useRef<HTMLDivElement | null>(null);
+  const imagesRef = useRef<HTMLImageElement[]>([]);
+  const currentFrameRef = useRef<number>(0);
+  const targetFrameRef = useRef<number>(0);
+  const animationFrameRef = useRef<number | null>(null);
 
   useLayoutEffect(() => {
     const sectionEl = sectionRef.current;
-    const videoEl = videoRef.current;
+    const canvasEl = canvasRef.current;
     const loadingEl = loadingRef.current;
-    if (!sectionEl || !videoEl) return;
+    if (!sectionEl || !canvasEl) return;
 
     // デバイス検出
     const detectDevice = () => {
@@ -37,157 +44,126 @@ export default function BloomScrollHero() {
       }
     };
 
-    // 初期検出
     detectDevice();
 
     // リサイズ時の検出
     const handleResize = () => {
       detectDevice();
+      updateCanvasSize();
     };
     window.addEventListener('resize', handleResize);
 
-    // デバイス検出のクリーンアップ
-    const removeDeviceDetection = () => {
-      window.removeEventListener('resize', handleResize);
-    };
-
-    // ロード画面のアニメーション
-    const hideLoading = () => {
-      if (loadingEl) {
-        gsap.to(loadingEl, {
-          opacity: 0,
-          duration: 1.2,
-          ease: "power2.inOut",
-          onComplete: () => {
-            setIsLoading(false);
-          }
-        });
+    // Canvasサイズの更新
+    const updateCanvasSize = () => {
+      if (!canvasEl) return;
+      
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvasEl.getBoundingClientRect();
+      
+      canvasEl.width = rect.width * dpr;
+      canvasEl.height = rect.height * dpr;
+      
+      const ctx = canvasEl.getContext('2d');
+      if (ctx) {
+        ctx.scale(dpr, dpr);
       }
     };
 
-    // 2秒後にロード画面を非表示
-    const loadingTimer = setTimeout(hideLoading, 2000);
+    // 連番画像のプリロード
+    const preloadImages = async () => {
+      const images: HTMLImageElement[] = [];
+      const loadPromises = FRAME_IMAGES.map((src, index) => {
+        return new Promise<HTMLImageElement>((resolve, reject) => {
+          const img = new Image();
+          img.src = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/${src}`;
+          img.onload = () => {
+            images[index] = img;
+            resolve(img);
+          };
+          img.onerror = reject;
+        });
+      });
 
-    let removeVideoTicker: (() => void) | undefined;
-    let removeLenisRaf: (() => void) | undefined;
-    let restoreLagSmoothing: (() => void) | undefined;
-    let removeResizeListener: (() => void) | undefined;
+      try {
+        await Promise.all(loadPromises);
+        imagesRef.current = images;
+        setImagesLoaded(true);
+        
+        // ロード画面を非表示
+        if (loadingEl) {
+          gsap.to(loadingEl, {
+            opacity: 0,
+            duration: 1.2,
+            ease: "power2.inOut",
+            onComplete: () => {
+              setIsLoading(false);
+            }
+          });
+        }
+      } catch (error) {
+        console.error('画像のプリロードに失敗しました:', error);
+      }
+    };
 
-    const lenis = new Lenis({
-      duration: 1.05,
-      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      smoothWheel: true,
-      touchMultiplier: 1.65,
-      wheelMultiplier: 1,
+    // 線形補間（Lerp）関数
+    const lerp = (start: number, end: number, factor: number): number => {
+      return start + (end - start) * factor;
+    };
+
+    // Canvas描画関数
+    const drawFrame = () => {
+      const ctx = canvasEl?.getContext('2d');
+      if (!ctx || imagesRef.current.length === 0) return;
+
+      // 現在のフレームと目標フレームの間を線形補間
+      const lerpFactor = 0.15; // イージングの強さ（0.1-0.2がおすすめ）
+      currentFrameRef.current = lerp(currentFrameRef.current, targetFrameRef.current, lerpFactor);
+
+      // 描画するフレーム番号を計算
+      const frameIndex = Math.floor(currentFrameRef.current);
+      const clampedIndex = Math.max(0, Math.min(frameIndex, imagesRef.current.length - 1));
+      
+      const image = imagesRef.current[clampedIndex];
+      if (image && image.complete) {
+        // Canvasをクリア
+        ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
+        
+        // 画像を描画（画面全体に広がるように）
+        const rect = canvasEl.getBoundingClientRect();
+        ctx.drawImage(image, 0, 0, rect.width, rect.height);
+      }
+
+      // 次のフレームを要求
+      animationFrameRef.current = requestAnimationFrame(drawFrame);
+    };
+
+    // ScrollTriggerによるスクロール同期
+    const scrollTrigger = ScrollTrigger.create({
+      trigger: sectionEl,
+      start: "top top",
+      end: "bottom top",
+      scrub: 0.8,
+      onUpdate: (self) => {
+        // スクロール進行度をフレーム番号に変換
+        const targetFrame = self.progress * (FRAME_IMAGES.length - 1);
+        targetFrameRef.current = targetFrame;
+      }
     });
 
-    const lenisRaf = (time: number) => {
-      lenis.raf(time * 1000);
-    };
-    gsap.ticker.add(lenisRaf);
-    removeLenisRaf = () => gsap.ticker.remove(lenisRaf);
-    lenis.on("scroll", ScrollTrigger.update);
+    // 初期化
+    updateCanvasSize();
+    preloadImages().then(() => {
+      // 画像読み込み完了後に描画開始
+      drawFrame();
+    });
 
-    const ctx = gsap.context(() => {
-      let onLoadedMetadata: (() => void) | null = null;
-      let videoSyncReady = false;
-
-      const setScrollSync = () => {
-        const duration = videoEl.duration;
-        if (!duration || Number.isNaN(duration) || videoSyncReady) return;
-        videoSyncReady = true;
-
-        videoEl.pause();
-        videoEl.playbackRate = 1.0;
-
-        // Canvas描画用の変数
-        const canvasEl = canvasRef.current;
-        const ctx = canvasEl?.getContext('2d') as CanvasRenderingContext2D | null;
-        let isVideoReady = false;
-
-        // 動画の準備が完了したらCanvas描画を開始
-        const setupCanvas = () => {
-          if (!canvasEl || !ctx || !videoEl) return;
-          
-          canvasEl.width = videoEl.videoWidth || 1920;
-          canvasEl.height = videoEl.videoHeight || 1080;
-          isVideoReady = true;
-        };
-
-        // Canvasに動画を描画する関数
-        const drawVideoToCanvas = () => {
-          if (!isVideoReady || !ctx || !videoEl || !canvasEl) return;
-          
-          try {
-            ctx.drawImage(videoEl, 0, 0, canvasEl.width, canvasEl.height);
-          } catch (e) {
-            // 動画がまだ準備できていない場合
-            console.log('Canvas draw error:', e);
-          }
-        };
-
-        // GSAP ScrollTriggerによる動画同期
-        setupCanvas();
-        
-        const videoScrollTrigger = ScrollTrigger.create({
-          trigger: sectionEl,
-          start: "top top",
-          end: "bottom top",
-          scrub: 0.8, // 慣性を持たせた滑らかなスクラビング
-          onUpdate: (self) => {
-            const progress = self.progress;
-            const targetTime = progress * duration;
-            
-            // スムージングなしの直接更新（GSAPが処理）
-            videoEl.currentTime = targetTime;
-            
-            // Canvas描画
-            drawVideoToCanvas();
-          },
-          onRefresh: () => {
-            // ScrollTriggerの更新時にCanvasを再設定
-            setupCanvas();
-          }
-        });
-
-        // ScrollTriggerのクリーンアップ
-        removeVideoTicker = () => {
-          videoScrollTrigger.kill();
-        };
-
-        // リサイズ対応
-        const onResize = () => {
-          ScrollTrigger.refresh();
-        };
-        window.addEventListener("resize", onResize, { passive: true });
-        removeResizeListener = () => {
-          window.removeEventListener("resize", onResize);
-        };
-      };
-
-      if (videoEl.readyState >= 1) {
-        setScrollSync();
-      } else {
-        onLoadedMetadata = () => setScrollSync();
-        videoEl.addEventListener("loadedmetadata", onLoadedMetadata, { once: true });
-      }
-
-      return () => {
-        if (onLoadedMetadata) {
-          videoEl.removeEventListener("loadedmetadata", onLoadedMetadata);
-        }
-      };
-    }, sectionRef);
-
+    // クリーンアップ
     return () => {
-      clearTimeout(loadingTimer);
-      removeVideoTicker?.();
-      removeLenisRaf?.();
-      lenis.destroy();
-      removeResizeListener?.();
-      removeDeviceDetection?.();
-      restoreLagSmoothing?.();
-      ctx.revert();
+      window.removeEventListener('resize', handleResize);
+      scrollTrigger.kill();
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
     };
   }, []);
 
@@ -224,15 +200,6 @@ export default function BloomScrollHero() {
       <div className="sticky-visuals">
         <div className="flower-slot" aria-hidden="true">
           <div className="flower-mask">
-            <video
-              ref={videoRef}
-              className="bloom-video"
-              src={encodeURI(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/${VIDEO_FILE}`)}
-              muted
-              playsInline
-              preload="auto"
-              style={{ display: 'none' }}
-            />
             <canvas
               ref={canvasRef}
               className="bloom-canvas"
@@ -789,9 +756,9 @@ export default function BloomScrollHero() {
 
         .bloom-canvas {
           position: absolute;
-          inset: -7%;
-          width: 114%;
-          height: 114%;
+          inset: 0;
+          width: 100%;
+          height: 100%;
           object-fit: cover;
           object-position: 50% 46%;
           filter: saturate(1.03) contrast(1.03) brightness(1.01);
