@@ -823,7 +823,7 @@ export default function BloomScrollHero() {
         }
 
         .site-footer {
-          position: fixed;
+          position: relative;
           left: 0;
           right: 0;
           bottom: 0;
